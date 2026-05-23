@@ -17,9 +17,6 @@ export async function login(
 ): Promise<FormState> {
 
   try {
-    const email = formData.get('email');
-    const password = formData.get('password');
-
     const validatedFields = LoginFormSchema.safeParse({
       email: formData.get('email'),
       password: formData.get('password'),
@@ -32,12 +29,14 @@ export async function login(
       };
     }
 
+    const { email, password } = validatedFields.data;
+
     let user: UserLogin | null = null;
     const res = await SatellitePublic.post(
       '/auth/login',
       {
-        email: email,
-        password: password,
+        email,
+        password,
       },
       {
         headers: {
@@ -45,12 +44,7 @@ export async function login(
         },
       }
     );
-    if (res.status === 401) {
-      return {
-        status: false,
-        message: 'Invalid email or password.',
-      };
-    }
+    
     const response = res.data;
 
     if (response.data && isUserLogin(response.data)) {
@@ -67,32 +61,18 @@ export async function login(
     const jwtToken = user?.access_token;
     if (jwtToken) {
       const cookiesObj = await cookies(); 
-      cookiesObj.set('TOKEN_AUTH', jwtToken,{
+      const cookieOptions = {
         httpOnly: true,
-        secure: true,
-        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax' as const,
         path: '/',
-      });
+      };
+
+      cookiesObj.set('TOKEN_AUTH', jwtToken, cookieOptions);
       if(user){
-        console.log(user);
-        cookiesObj.set('USER_NAME', user.name, {
-          httpOnly: true,
-          secure: true,
-          sameSite: 'lax',
-          path: '/',
-        });
-        cookiesObj.set('USER_EMAIL', user.email, {
-          httpOnly: true,
-          secure: true,
-          sameSite: 'lax',
-          path: '/',
-        });
-        cookiesObj.set('USER_ROLE', user.role, {
-          httpOnly: true,
-          secure: true,
-          sameSite: 'lax',
-          path: '/',
-        });
+        cookiesObj.set('USER_NAME', user.name, cookieOptions);
+        cookiesObj.set('USER_EMAIL', user.email, cookieOptions);
+        cookiesObj.set('USER_ROLE', user.role, cookieOptions);
       }
       return { 
         status: true,
@@ -105,19 +85,23 @@ export async function login(
       };
     }
   } catch (error) {
-    if (error instanceof AxiosError) {
-      const message = error.response?.data?.message || 'An error occurred.';
+    console.error('LOGIN ERROR:', error);
+    if (axios.isAxiosError(error)) {
+      if (error.code === 'ERR_NETWORK') {
+        return {
+          status: false,
+          message: 'Server tidak terjangkau. Pastikan server backend sudah menyala.',
+        };
+      }
       return {
         status: false,
-        message: message || 'Unexpected server error.',
-      };
-    } else {
-      console.error('Unexpected error:', error);
-      return {
-        status: false,
-        message: 'An unexpected error occurred.',
+        message: error.response?.data?.message || 'Terjadi kesalahan saat login.',
       };
     }
+    return {
+      status: false,
+      message: 'Terjadi kesalahan yang tidak terduga.',
+    };
   } finally {
     if (state) {
       state.errors = {};

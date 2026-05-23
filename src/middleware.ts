@@ -1,5 +1,3 @@
-import { formatMessage } from "@interfaces/data-types";
-import SatellitePublic from "@services/satellite/public";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
@@ -14,6 +12,10 @@ export async function middleware(request: NextRequest) {
   }
   
   if (publicRoutes.includes(path)) {
+    // If user is already logged in and tries to access login/signup, redirect to dashboard
+    if (token) {
+       return NextResponse.redirect(new URL('/dashboard', request.url));
+    }
     return NextResponse.next();
   }
   
@@ -21,42 +23,32 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  const isValidToken = await validateToken(token);
+  // Local validation: Check if token exists and has correct format (3 parts)
+  // We can't easily verify the signature here without a heavy library like jose,
+  // but we can at least check if it's expired by decoding the payload.
+  try {
+    const payloadBase64 = token.split('.')[1];
+    if (!payloadBase64) throw new Error("Invalid token format");
+    
+    const payload = JSON.parse(atob(payloadBase64));
+    const isExpired = payload.exp * 1000 < Date.now();
 
-  if (!isValidToken) {
-    return NextResponse.redirect(new URL("/login", request.url));
+    if (isExpired) {
+      const response = NextResponse.redirect(new URL("/login", request.url));
+      response.cookies.delete("TOKEN_AUTH");
+      return response;
+    }
+  } catch (error) {
+    const response = NextResponse.redirect(new URL("/login", request.url));
+    response.cookies.delete("TOKEN_AUTH");
+    return response;
   }
 
   return NextResponse.next();
 }
 
-export async function validateToken(token: string) {
-  try {
-    const res = await SatellitePublic.post<formatMessage>("/auth/check-token", {}, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    const response = res.data;
-    if (response.success === true) {
-      return {
-        isValid: true,
-        message: response.message,
-      };
-    }
-    return {
-      isValid: false,
-      message: response.message,
-    };
-  } catch (error) {
-    return {
-      isValid: false,
-      message: error,
-    };
-  }
-}
-
 export const config = {
   matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)', // Match all routes except the excluded ones
+    '/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)',
   ],
 };

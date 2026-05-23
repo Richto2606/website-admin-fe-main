@@ -3,7 +3,7 @@ import axios, { AxiosResponse } from "axios";
 
 const SatellitePublic = axios.create({
   baseURL: process.env.NEXT_BASE_URL_API,
-  timeout: 10000,
+  timeout: 30000,
   headers: {
     "Content-Type": "application/json",
     "X-API-KEY": process.env.NEXT_API_KEY,

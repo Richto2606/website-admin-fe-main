@@ -9,7 +9,7 @@ import { UserLogin, UserRegister, formatMessage } from '@interfaces/data-types';
 import { cookies } from 'next/headers';
 import { FormState } from '@interfaces/interface-items';
 import SatellitePrivate from '@services/satellite/private';
-import { AxiosError } from 'axios';
+import axios, { AxiosError } from 'axios';
 
 export async function login(
   state: FormState,

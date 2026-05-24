@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Button } from '@components/button';
 import CustomText from '@components/particel/custom-text';
 import DynamicCard from '@components/particel/dynamic-card';
@@ -13,11 +13,11 @@ import { useRouter } from 'next/navigation';
 import { useQueryClient } from '../hook';
 
 export default function AddResidentsPage() {
-  const router = useRouter(); 
-  const [formData, setFormData] = useState<ResidentAddForm>({
+  const router = useRouter();
+  const formDataRef = useRef<ResidentAddForm>({
     name: '',
     age: '',
-    birth_date_convert: new Date(),
+    birth_date_convert: undefined,
     birth_date: '',
     phone_number: '',
     origin_campus_id:'',
@@ -26,15 +26,15 @@ export default function AddResidentsPage() {
     origin_city_id: '',
     status: '',
   });
-    const { isLoading, createResident } = useQueryClient();
+  
+  const { isLoading, createResident } = useQueryClient();
 
   const handleFormSubmit = (data: ResidentAddForm) => {
-    setFormData(data);
+    formDataRef.current = data;
   };
 
   const handleSave = async () => {
-
-    await createResident(formData, () => {
+    await createResident(formDataRef.current, () => {
       router.push('/residents');
     });
   }
@@ -48,7 +48,7 @@ export default function AddResidentsPage() {
           border={true}
           header={
             <div className="flex p-4 justify-between items-center">
-              <CustomText text={`Tambah ${residentString} Baru`} textSize="2xl" />
+              <CustomText text={`Tambah {residentString} Baru`} textSize="2xl" />
               <div className="flex flex-row items-center space-x-4">
                 <Link href={'/residents'}>
                   <Button

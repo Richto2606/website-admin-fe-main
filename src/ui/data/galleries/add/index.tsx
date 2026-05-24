@@ -15,7 +15,7 @@ import { CloudUpload, File } from 'lucide-react';
 import { bytesToMb } from '@utils/format';
 import { useToast } from '@interfaces/use-toast';
 import { FileValidationResult } from '@interfaces/interface-items';
-import { 
+import {
   validateFileImage,
   validateFileTypeImage
 } from '@utils/fileValidation';
@@ -25,6 +25,8 @@ import { Textarea } from '@components/textarea';
 export default function AddGalleries({ onSubmit }: { onSubmit: (data: GalleryAddForm) => void }) {
   const { toast } = useToast();
   const [categories, setCategories] = useState<Categories[]>([]);
+  const [isMounted, setIsMounted] = useState(false);
+  
   const form = useForm<GalleryAddForm>({
     defaultValues: {
       title: '',
@@ -37,6 +39,7 @@ export default function AddGalleries({ onSubmit }: { onSubmit: (data: GalleryAdd
   });
 
   useEffect(() => {
+    setIsMounted(true);
     const fetchCategories = async () => {
       try {
         const res = await SatellitePrivate.get<formatMessage<Categories[]>>('/categories');
@@ -76,7 +79,6 @@ export default function AddGalleries({ onSubmit }: { onSubmit: (data: GalleryAdd
       }
 
       if (url.length > 4){
-        console.log("url:",url.length);
         if (type === 'Video') {
           if (url && !url.startsWith('http')) {
             toast({
@@ -93,6 +95,8 @@ export default function AddGalleries({ onSubmit }: { onSubmit: (data: GalleryAdd
       onSubmit(data);
     }
   };
+
+  if (!isMounted) return null;
 
   return (
     <div className="flex p-4 justify-between">
@@ -134,7 +138,7 @@ export default function AddGalleries({ onSubmit }: { onSubmit: (data: GalleryAdd
                     ariaLabel={`Tipe ${galleryString}`}
                     onValueChange={(value) => {
                       field.onChange(value);
-                      handleFormChange(form.getValues()); 
+                      handleFormChange(form.getValues());
                     }}
                   />
                 </FormControl>
@@ -245,7 +249,7 @@ export default function AddGalleries({ onSubmit }: { onSubmit: (data: GalleryAdd
                             }
                           >
                             <File className="w-12 h-12 mb-2 md:w-12 md:h-12" />
-                            {Array.from(field.value).map((file: File, index: number) => {
+                            {Array.from(field.value).map((file: any, index: number) => {
                               return (
                                 <div className="flex flex-col ml-2" key={index}>
                                   <span>{file.name}</span>
@@ -257,7 +261,7 @@ export default function AddGalleries({ onSubmit }: { onSubmit: (data: GalleryAdd
                             })}
                           </div>
                         )}
-                       
+
                         <input
                           id="fileUploadInput"
                           type="file"

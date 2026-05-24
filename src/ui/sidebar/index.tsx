@@ -16,7 +16,7 @@ const Sidebar = () => {
           {menuItems.map((item, index) => (
             <CommandItem key={index} className="my-4">
               <item.icon className="mr-[32px] h-6 w-6" />
-              <Link href={item.link} className="hidden lg:block">{item.label}</Link>
+              <Link href={item.link} className="hidden lg:block"><span suppressHydrationWarning>{item.label}</span></Link>
             </CommandItem>
           ))}
         </CommandList>

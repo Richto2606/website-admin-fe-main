@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Button } from '@components/button';
 import CustomText from '@components/particel/custom-text';
 import DynamicCard from '@components/particel/dynamic-card';
@@ -14,7 +14,7 @@ import { useQueryClient } from '../hook';
 
 export default function AddGalleriesPage() {
   const router = useRouter();
-  const [formData, setFormData] = useState<GalleryAddForm>({
+  const formDataRef = useRef<GalleryAddForm>({
     title: '',
     type: 'Foto',
     category_id: '',
@@ -22,15 +22,15 @@ export default function AddGalleriesPage() {
     files: undefined,
     url: ''
   });
+  
   const { isLoading, createGallery } = useQueryClient();
 
   const handleFormSubmit = (data: GalleryAddForm) => {
-    setFormData(data);
+    formDataRef.current = data;
   };
 
   const handleSave = async () => {
-
-    await createGallery(formData, () => {
+    await createGallery(formDataRef.current, () => {
       router.push('/galleries');
     });
   }
@@ -44,7 +44,7 @@ export default function AddGalleriesPage() {
           border={true}
           header={
             <div className="flex p-4 justify-between items-center">
-              <CustomText text={`Tambah ${galleryString} Baru`} textSize="2xl" />
+              <CustomText text={`Tambah {galleryString} Baru`} textSize="2xl" />
               <div className="flex flex-row items-center space-x-4">
                 <Link href={'/galleries'}>
                   <Button

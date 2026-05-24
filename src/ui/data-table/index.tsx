@@ -76,10 +76,7 @@ export function DataTable<TData, TValue>({
                     }
                     return (
                       <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
+                        <div suppressHydrationWarning>{flexRender(cell.column.columnDef.cell, cell.getContext())}</div>
                       </TableCell>
                     );
                   })}

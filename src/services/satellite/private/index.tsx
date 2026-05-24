@@ -4,7 +4,7 @@ import axios, { AxiosInstance, InternalAxiosRequestConfig } from "axios";
 
 const SatellitePrivate: AxiosInstance = axios.create({
   baseURL: process.env.NEXT_BASE_URL_API,
-  timeout: 10000,
+  timeout: 30000,
   headers: {
     "Content-Type": "application/json",
     "X-API-KEY": process.env.NEXT_API_KEY,

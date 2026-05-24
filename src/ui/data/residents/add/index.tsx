@@ -1,4 +1,3 @@
-
 import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@components/form';
 import { Input } from '@components/input';
@@ -22,6 +21,7 @@ export default function AddResidents({ onSubmit }: { onSubmit: (data: ResidentAd
   const [originCampuses, setOriginCampuses] = useState<OriginCampus[]>([]);
   const [roomNumbers, setRoomNumbers] = useState<RoomNumbers[]>([]);
   const [originCities, setOriginCities] = useState<OriginCity[]>([]);
+  const [isMounted, setIsMounted] = useState(false);
 
   const form = useForm<ResidentAddForm>({
     defaultValues: {
@@ -39,6 +39,7 @@ export default function AddResidents({ onSubmit }: { onSubmit: (data: ResidentAd
   });
 
   useEffect(() => {
+    setIsMounted(true);
     const fetchOriginCampus = async () => {
       try {
         const res = await SatellitePrivate.get<formatMessage<OriginCampus[]>>('/origin-campuses');
@@ -82,18 +83,18 @@ export default function AddResidents({ onSubmit }: { onSubmit: (data: ResidentAd
     fetchRoomNumbers();
     fetchOriginCtiy();
   }, []);
-  
+
   const [previousData, setPreviousData] = useState<ResidentAddForm>(form.getValues());
 
   const handleFormChange = (data: ResidentAddForm) => {
     const { phone_number, age, birth_date_convert, address } = data;
-    const hasChanged = 
+    const hasChanged =
       previousData.age !== age ||
       previousData.phone_number !== phone_number ||
       previousData.birth_date_convert !== birth_date_convert ||
       previousData.address !== address;
     let success = true;
-    
+
     if (hasChanged) {
       if(phone_number.length < 15 ){
         if(phone_number.length > 2  && phone_number.length < 15 ){
@@ -127,12 +128,14 @@ export default function AddResidents({ onSubmit }: { onSubmit: (data: ResidentAd
       if (birth_date_convert) {
         data.birth_date = format(new Date(birth_date_convert), 'yyyy-MM-dd');
       }
-      
+
     }
     if(success){
       onSubmit(data);
     }
   };
+
+  if (!isMounted) return null;
 
   return (
     <div className="flex p-4 justify-between">
@@ -215,7 +218,7 @@ export default function AddResidents({ onSubmit }: { onSubmit: (data: ResidentAd
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0">
-                          <Calendar 
+                          <Calendar
                             mode='single'
                             selected={typeof field.value === "number" ? new Date(field.value) : field.value}
                             onSelect={(date) => {
@@ -225,7 +228,7 @@ export default function AddResidents({ onSubmit }: { onSubmit: (data: ResidentAd
                             disabled={(date) => date > new Date()}
                             footer={
                               field.value
-                                ? `Tanggal terpilih: ${format(typeof field.value === "number" ? new Date(field.value) : field.value, 'dd/M/yyyy')}`
+                                ? `Tanggal terpilih: ${format(typeof field.value === "number" ? new Date(field.value) : field.value, 'dd/M/yyyy')}`    
                                 : "Pick a day."
                             }
                             defaultMonth={typeof field.value === "number" ? new Date(field.value) : field.value || new Date()}
@@ -275,8 +278,8 @@ export default function AddResidents({ onSubmit }: { onSubmit: (data: ResidentAd
                   <FormItem>
                     <FormLabel className="text-xs">{addResidentForm[4].label}</FormLabel>
                     <FormControl>
-                      <Select 
-                        value={field.value} 
+                      <Select
+                        value={field.value}
                         onValueChange={(value) => {
                           field.onChange(value);
                           handleFormChange(form.getValues());
@@ -290,7 +293,7 @@ export default function AddResidents({ onSubmit }: { onSubmit: (data: ResidentAd
                         </SelectTrigger>
                         <SelectContent>
                           {originCampuses.map((item, index) => (
-                            <SelectItem value={item.id} key={index}>
+                            <SelectItem value={item.id} key={item.id}>
                               {item.name}
                             </SelectItem>
                           ))}
@@ -323,7 +326,7 @@ export default function AddResidents({ onSubmit }: { onSubmit: (data: ResidentAd
                         </SelectTrigger>
                         <SelectContent>
                           {roomNumbers.map((item, index) => (
-                            <SelectItem value={item.id} key={index}>
+                            <SelectItem value={item.id} key={item.id}>
                               {item.name}
                             </SelectItem>
                           ))}
@@ -379,7 +382,7 @@ export default function AddResidents({ onSubmit }: { onSubmit: (data: ResidentAd
                         </SelectTrigger>
                         <SelectContent>
                           {originCities.map((item, index) => (
-                            <SelectItem value={item.id} key={index}>
+                            <SelectItem value={item.id} key={item.id}>
                               {item.name}
                             </SelectItem>
                           ))}

@@ -21,7 +21,7 @@ import { useToast } from '@interfaces/use-toast';
 
 export default function AddReport({ onSubmit }: { onSubmit: (data: ReportAddForm) => void }) {
   const { toast } = useToast();
-  const [categories, setCategories] = useState<{ value: string; text: string }[]>([
+  const [categories] = useState<{ value: string; text: string }[]>([
     { value: "Pemasukan", text: 'Pemasukan' },
     { value: "Pengeluaran", text: 'Pengeluaran' }
   ]);
@@ -67,6 +67,7 @@ export default function AddReport({ onSubmit }: { onSubmit: (data: ReportAddForm
       }
     }
     if(success){
+      setPreviousData(data);
       onSubmit(data);
     }
   };

@@ -1,11 +1,12 @@
 import { RadioButtonItem } from '@interfaces/interface-items';
 import { 
-    LayoutDashboard, 
-    Images, 
-    UserRoundPen,
-    WalletMinimal,
-    ChartColumnDecreasing,
-    FileText
+  LayoutDashboard, 
+  Images, 
+  UserRoundPen,
+  WalletMinimal,
+  ChartColumnDecreasing,
+  FileText,
+  UserCheck // <--- 1. Tambahkan ikon ini untuk menu validasi
 } from 'lucide-react';
 import { 
   createTitleAndBreadcrumbs, 
@@ -30,7 +31,7 @@ const menuItems: Array<{
   {
     label: 'Dashboard',
     icon: LayoutDashboard,
-    link: '/',
+    link: '/dashboard', // <--- 2. Ubah ini menjadi /dashboard
   },
   {
     label: galleries.indexTitle,
@@ -42,6 +43,14 @@ const menuItems: Array<{
     icon: UserRoundPen,
     link: `/${residentUrl}`,
   },
+  
+  // <--- 3. TAMBAHKAN MENU VALIDASI PENGHUNI DI SINI --->
+  {
+    label: 'Validasi Penghuni',
+    icon: UserCheck,
+    link: '/validasi',
+  },
+
   {
     label: payments.indexTitle,
     icon: WalletMinimal,

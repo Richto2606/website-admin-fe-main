@@ -139,6 +139,7 @@ export default function EditResidents({
       }
     }
     if(success){
+      setPreviousData(data);
       onSubmit(data);
     }
   };

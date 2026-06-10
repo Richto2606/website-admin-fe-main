@@ -31,7 +31,6 @@ import { register } from '@services/auth/01-auth';
 
 export function RegisterForm() {
   const { toast } = useToast();
-  const [pending, setPending] = useState(false);
   const [stateFormData, setStateFormData] = useState<RegisterRequest>({
     name: '',
     email: '',
@@ -55,7 +54,6 @@ export function RegisterForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
-      setPending(true);
   
       try {
         const formData = new FormData(e.target as HTMLFormElement);
@@ -94,8 +92,6 @@ export function RegisterForm() {
           ...prevState,
           message: 'An error occurred during login.',
         }));
-      } finally {
-        setPending(false);
       }
     };
 
@@ -104,7 +100,7 @@ export function RegisterForm() {
       <CardHeader>
         <CardTitle>Register</CardTitle>
         <CardDescription>
-          Welcome to Register Page Asrama Kutai Karta Negara - Admin
+          Welcome to Register Page Asrama Kutai Kartanegara - Admin
         </CardDescription>
       </CardHeader>
       <CardContent className='space-y-2'>

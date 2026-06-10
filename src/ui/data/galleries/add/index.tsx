@@ -19,7 +19,6 @@ import {
   validateFileImage,
   validateFileTypeImage
 } from '@utils/fileValidation';
-import { Button } from '@components/button';
 import { Textarea } from '@components/textarea';
 
 export default function AddGalleries({ onSubmit }: { onSubmit: (data: GalleryAddForm) => void }) {
@@ -92,6 +91,7 @@ export default function AddGalleries({ onSubmit }: { onSubmit: (data: GalleryAdd
       }
     }
     if (success) {
+      setPreviousData(data);
       onSubmit(data);
     }
   };
@@ -249,12 +249,13 @@ export default function AddGalleries({ onSubmit }: { onSubmit: (data: GalleryAdd
                             }
                           >
                             <File className="w-12 h-12 mb-2 md:w-12 md:h-12" />
-                            {Array.from(field.value).map((file: any, index: number) => {
+                            {Array.from(field.value).map((file: unknown, index: number) => {
+                              const typedFile = file as File;
                               return (
                                 <div className="flex flex-col ml-2" key={index}>
-                                  <span>{file.name}</span>
+                                  <span>{typedFile.name}</span>
                                   <span className="text-muted-foreground">
-                                    {bytesToMb(file.size)}
+                                    {bytesToMb(typedFile.size)}
                                   </span>
                                 </div>
                               );

@@ -1,54 +1,46 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-const publicRoutes = ['/login', '/signup'];
-
-export async function middleware(request: NextRequest) {
-  const token = request.cookies.get("TOKEN_AUTH")?.value;
+export function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
   
-  if (path === '/') {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
-  }
-  
-  if (publicRoutes.includes(path)) {
-    // If user is already logged in and tries to access login/signup, redirect to dashboard
-    if (token) {
-       return NextResponse.redirect(new URL('/dashboard', request.url));
+  // Ambil token dan pastikan role dibaca sebagai huruf kecil semua
+  const token = request.cookies.get('TOKEN_AUTH')?.value;
+  const role = request.cookies.get('USER_ROLE')?.value?.toLowerCase();
+
+  // Variabel untuk mengecek apakah user sudah memiliki sesi valid sebagai admin
+  const isLoggedInAsAdmin = token && role === 'admin';
+
+  // 1. Jika mengakses path '/' atau '/login'
+  if (path === '/' || path.startsWith('/login')) {
+    if (isLoggedInAsAdmin) {
+      // Jika sudah login, langsung "terbangkan" ke dashboard!
+      return NextResponse.redirect(new URL('/dashboard', request.url));
     }
+    
+    // Jika belum login dan mencoba mengakses '/', arahkan ke '/login'
+    if (path === '/') {
+       return NextResponse.redirect(new URL('/login', request.url));
+    }
+    
+    // Jika belum login dan di '/login', biarkan lewat untuk memunculkan form
     return NextResponse.next();
   }
-  
-  if (!token) {
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
 
-  // Local validation: Check if token exists and has correct format (3 parts)
-  // We can't easily verify the signature here without a heavy library like jose,
-  // but we can at least check if it's expired by decoding the payload.
-  try {
-    const payloadBase64 = token.split('.')[1];
-    if (!payloadBase64) throw new Error("Invalid token format");
-    
-    const payload = JSON.parse(atob(payloadBase64));
-    const isExpired = payload.exp * 1000 < Date.now();
-
-    if (isExpired) {
-      const response = NextResponse.redirect(new URL("/login", request.url));
-      response.cookies.delete("TOKEN_AUTH");
-      return response;
+  // 2. Proteksi khusus folder dashboard
+  if (path.startsWith('/dashboard')) {
+    if (!isLoggedInAsAdmin) {
+      // Jika belum login (atau token kadaluarsa), lempar kembali ke halaman login
+      return NextResponse.redirect(new URL('/login', request.url));
     }
-  } catch (error) {
-    const response = NextResponse.redirect(new URL("/login", request.url));
-    response.cookies.delete("TOKEN_AUTH");
-    return response;
   }
 
+  // Biarkan file statis/gambar Next.js lewat
   return NextResponse.next();
 }
 
 export const config = {
   matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
   ],
 };

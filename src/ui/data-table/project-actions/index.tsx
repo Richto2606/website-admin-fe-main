@@ -1,6 +1,6 @@
 "use client";
 
-import { Edit, Eye, MoreVertical, Trash } from "lucide-react";
+import { Edit, MoreVertical, Trash } from "lucide-react";
 
 import { Button } from "@/components/button";
 import {

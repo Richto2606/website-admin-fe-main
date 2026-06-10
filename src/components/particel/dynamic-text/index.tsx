@@ -2,7 +2,7 @@ import { cn } from "@lib/utils";
 import CustomText from "../custom-text";
 
 const DynamicText = ({ 
-  text = 'ASRAMA KUTAI KARTANEGARA', 
+  text = 'ASRAMA PUTRA KUTAI KARTANEGARA', 
   subText = 'Kota Yogyakarta', 
   boldText = true, 
   boldSubText = false, 

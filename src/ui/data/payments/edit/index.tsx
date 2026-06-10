@@ -100,6 +100,7 @@ export default function EditPayments({
     }
 
     if(success){
+      setPreviousData(data);
       onSubmit(data);
     }
   };

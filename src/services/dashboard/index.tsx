@@ -1,5 +1,6 @@
 import { chartIncomeData, chartOutcomeData, formatMessage, StaticData} from '@interfaces/data-types';
 import SatellitePrivate from '@services/satellite/private';
+import api from '@/lib/axios';
 
 export async function getResidentActive(): Promise<formatMessage<StaticData>> {
   try {

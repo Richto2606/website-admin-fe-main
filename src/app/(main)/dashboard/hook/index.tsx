@@ -2,12 +2,12 @@
 
 import { chartIncomeData, chartOutcomeData, StaticData } from '@interfaces/data-types';
 import { getKamarTerpakai, getPemasukanBulanan, getPengeluaranBulanan, getResidentActive, getSinkronisasiPayment } from '@services/dashboard';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 
 export function useQueryClient() {
   const [isLoading, setIsLoading] = useState(false);
 
-  const activeResidents = async (
+  const activeResidents = useCallback(async (
     onSuccess?: () => void
   ) : Promise<StaticData | null> => {
     setIsLoading(true);
@@ -26,9 +26,9 @@ export function useQueryClient() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const kamarTerpakai = async (
+  const kamarTerpakai = useCallback(async (
     onSuccess?: () => void
   ) : Promise<StaticData | null> => {
     setIsLoading(true);
@@ -47,9 +47,9 @@ export function useQueryClient() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const pemasukanBulanan = async (
+  const pemasukanBulanan = useCallback(async (
     bulan: number, 
     onSuccess?: () => void
   ) : Promise<chartIncomeData | null> => {
@@ -69,9 +69,9 @@ export function useQueryClient() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const pengeluranBulanan = async (
+  const pengeluranBulanan = useCallback(async (
     bulan: number, 
     onSuccess?: () => void
   ) : Promise<chartOutcomeData | null> => {
@@ -91,9 +91,9 @@ export function useQueryClient() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const sinkronisasiPayment = async (
+  const sinkronisasiPayment = useCallback(async (
     onSuccess?: () => void
   ) : Promise<StaticData | null> => {
     setIsLoading(true);
@@ -112,7 +112,7 @@ export function useQueryClient() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
   return {
     isLoading,
     activeResidents,

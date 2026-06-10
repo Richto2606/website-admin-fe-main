@@ -8,7 +8,6 @@ import ProjectTextOrdering from "@ui/data-table/project-text-ordering";
 import ProjectFile from "@ui/data-table/project-file";
 import { ProjectActions } from "@ui/data-table/project-actions";
 import { galleryString, galleryUrl } from "@constant/breadcrumbs";
-import { formatShortName } from "@utils/format";
 import ProjectTextTooltip from "@ui/data-table/project-text-tooltip";
 
 export const columns: ColumnDef<Gallery, unknown>[] = [

@@ -135,7 +135,7 @@ export type ResidentAddForm = {
   name: string;
   age: string | number;
   birth_date: string;
-  birth_date_convert: Date;
+  birth_date_convert: Date | undefined;
   phone_number: string;
   origin_campus_id: string;
   room_number_id: string;
@@ -149,7 +149,7 @@ export type ResidentEditForm = {
   name: string;
   age: string | number;
   birth_date: string;
-  birth_date_convert: Date;
+  birth_date_convert: Date | undefined;
   phone_number: string;
   origin_campus_id: string;
   room_number_id: string;
@@ -175,7 +175,7 @@ export type Payment = {
 export type PaymentAddForm = {
   resident_id: string;
   billing_date: string;
-  billing_date_convert: Date | number;
+  billing_date_convert: Date | number | undefined;
   billing_amount: string | number;
   status: string;
   payment_evidence: File;
@@ -186,7 +186,7 @@ export type PaymentEditForm = {
   resident_id: string;
   resident_name: string;
   billing_date: string;
-  billing_date_convert: Date | number;
+  billing_date_convert: Date | number | undefined;
   billing_amount: string | number;
   status: string;
   payment_evidence: File | null;
@@ -208,7 +208,7 @@ export type Report = {
 export type ReportAddForm = {
   title: string;
   report_date: string;
-  report_date_convert: Date | number;
+  report_date_convert: Date | number | undefined;
   report_amount: string | number;
   report_categories: string;
   report_evidence: File;
@@ -218,7 +218,7 @@ export type ReportAddForm = {
 export type ReportEditForm = { 
   title: string;
   report_date: string;
-  report_date_convert: Date | number;
+  report_date_convert: Date | number | undefined;
   report_amount: string | number;
   report_categories: string;
   report_evidence: File | null;

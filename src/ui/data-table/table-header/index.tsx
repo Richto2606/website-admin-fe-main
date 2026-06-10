@@ -10,7 +10,7 @@ import {
   TableRow,
 } from "@components/table";
 
-const TableHeader = <TData, _>({ table }: { table: Table<TData> }) => {
+const TableHeader = <TData,>({ table }: { table: Table<TData> }) => {
   return (
     <ShadTableHeader className="bg-background text-foreground">
       {table.getHeaderGroups().map((headerGroup) => (

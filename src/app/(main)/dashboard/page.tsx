@@ -4,7 +4,7 @@ import { createTitleAndBreadcrumbs, dashboardString, dashboardUrl } from "@const
 import { DataStaticCardProps } from "@interfaces/interface-items";
 import Breadcumbs from "@ui/breadcrumbs";
 import { useQueryClient } from "./hook";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import DashboardCard from "@components/particel/dashboard-card";
 import ChartCard from "@components/particel/dashboard-chart";
 import DynamicCard from "@components/particel/dynamic-card";
@@ -17,168 +17,122 @@ import {
 } from "@components/select";
 import { formatCurrency } from "@utils/format";
 
-export default function DashboardPage() {
+const bulan = [
+  { value: 1, text: 'Januari' },
+  { value: 2, text: 'Februari' },
+  { value: 3, text: 'Maret' },
+  { value: 4, text: 'April' },
+  { value: 5, text: 'Mei' },
+  { value: 6, text: 'Juni' },
+  { value: 7, text: 'Juli' },
+  { value: 8, text: 'Agustus' },
+  { value: 9, text: 'September' },
+  { value: 10, text: 'Oktober' },
+  { value: 11, text: 'November' },
+  { value: 12, text: 'Desember' },
+];
 
-  const weeklyLabels = ['Minggu Ke-1', 'Minggu Ke-2', 'Minggu Ke-3', 'Minggu Ke-4'];
+export default function DashboardPage() {
+  const weeklyLabels = useMemo(() => ['Minggu Ke-1', 'Minggu Ke-2', 'Minggu Ke-3', 'Minggu Ke-4'], []);
 
   const { activeResidents, kamarTerpakai, pemasukanBulanan, pengeluranBulanan, sinkronisasiPayment } = useQueryClient();
-  const [isLoading, setIsLoading] = useState(true);
   const [penghuni, setPenghuni] = useState<DataStaticCardProps[]>([]);
   const [kamar, setKamar] = useState<DataStaticCardProps[]>([]);
   const [pemasukan, setPemasukan] = useState<number[]>([]);
   const [pengeluran, setPengeluran] = useState<number[]>([]);
   const [pendapatan, setPendapatan] = useState<number>(0);
   const [sinkronisasi, setSinkronisasi] = useState<number>(0);
-  const [bulan, setBulan] = useState<{ value: number; text: string }[]>([
-    { value: 1, text: 'Januari' },
-    { value: 2, text: 'Februari' },
-    { value: 3, text: 'Maret' },
-    { value: 4, text: 'April' },
-    { value: 5, text: 'Mei' },
-    { value: 6, text: 'Juni' },
-    { value: 7, text: 'Juli' },
-    { value: 8, text: 'Agustus' },
-    { value: 9, text: 'September' },
-    { value: 10, text: 'Oktober' },
-    { value: 11, text: 'November' },
-    { value: 12, text: 'Desember' },
-  ]);
   const [monthPemasukan, setMonthPemasukan] = useState<number>(new Date().getMonth() + 1); 
   const [monthPengeluaran, setMonthPengeluaran] = useState<number>(new Date().getMonth() + 1); 
 
-  const hasFetched = useRef(false);
+  const isInitialMount = useRef(true);
+  const hasFetchedInitial = useRef(false);
 
+  // Initial fetch for all data
   useEffect(() => {
-    if (hasFetched.current) return;
+    if (hasFetchedInitial.current) return;
 
-    const fetchActiveResident = async () => {
+    const fetchInitialData = async () => {
       try {
-        const datas = await activeResidents(() => {});
-        if (datas) {
+        const [resResidents, resKamar, resPemasukan, resPengeluaran, resSinkronisasi] = await Promise.all([
+          activeResidents(),
+          kamarTerpakai(),
+          pemasukanBulanan(monthPemasukan),
+          pengeluranBulanan(monthPengeluaran),
+          sinkronisasiPayment()
+        ]);
+
+        if (resResidents) {
           setPenghuni([
-            {
-              name: "Total",
-              count: datas.data_count,
-              fill: "white",
-            },
-            {
-              name: "Penghuni",
-              count: datas.data_active,
-              fill: "#2280CC",
-            }
+            { name: "Total", count: resResidents.data_count, fill: "white" },
+            { name: "Penghuni", count: resResidents.data_active, fill: "#2280CC" }
           ]);
         }
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    const fetchKamarTerpakai = async () => {
-      try {
-        const datas = await kamarTerpakai(() => {});
-        if (datas) {
+        if (resKamar) {
           setKamar([
-            {
-              name: "Total",
-              count: datas.data_count,
-              fill: "white",
-            },
-            {
-              name: "Kamar",
-              count: datas.data_active,
-              fill: "#2280CC",
-            }
+            { name: "Total", count: resKamar.data_count, fill: "white" },
+            { name: "Kamar", count: resKamar.data_active, fill: "#2280CC" }
           ]);
         }
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    const fetchPemasukan = async (month: number) => {
-      try {
-        const datas = await pemasukanBulanan(month, () => {});
-        if (datas) {
-          setPemasukan(datas.weekly_income);
-          const totalPemasukan = datas.total_income;
-          setPendapatan((prevPendapatan) => prevPendapatan + totalPemasukan);
+        if (resPemasukan) {
+          setPemasukan(resPemasukan.weekly_income);
+          setPendapatan(prev => prev + resPemasukan.total_income);
         }
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    const fetchPengeluaran = async (month: number) => {
-      try {
-        const datas = await pengeluranBulanan(month, () => {});
-        if (datas) {
-          setPengeluran(datas.weekly_outcome);
-          const totalPengeluaran = datas.total_outcome;
-          setPendapatan((prevPendapatan) => prevPendapatan - totalPengeluaran);
+        if (resPengeluaran) {
+          setPengeluran(resPengeluaran.weekly_outcome);
+          setPendapatan(prev => prev - resPengeluaran.total_outcome);
         }
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    const fetchSinkronisasi = async () => {
-      try {
-        const datas = await sinkronisasiPayment(() => {});
-        if (datas) {
-          setSinkronisasi(datas.data_active);
+        if (resSinkronisasi) {
+          setSinkronisasi(resSinkronisasi.data_active);
         }
+        hasFetchedInitial.current = true;
       } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
+        console.error("Error fetching initial dashboard data:", error);
       }
     };
 
-    fetchActiveResident();
-    fetchKamarTerpakai();
-    fetchPemasukan(monthPemasukan);
-    fetchPengeluaran(monthPengeluaran);
-    fetchSinkronisasi();
-    hasFetched.current = true;
-  }, [activeResidents, kamarTerpakai, pemasukanBulanan, pengeluranBulanan]);
+    fetchInitialData();
+  }, [activeResidents, kamarTerpakai, pemasukanBulanan, pengeluranBulanan, sinkronisasiPayment, monthPemasukan, monthPengeluaran]);
 
+  // Subsequent fetch for month changes (Income)
   useEffect(() => {
-    const fetchPemasukan = async (month: number) => {
+    if (isInitialMount.current) return;
+    
+    const fetchNewPemasukan = async () => {
       try {
-        const datas = await pemasukanBulanan(month, () => {});
+        const datas = await pemasukanBulanan(monthPemasukan);
         if (datas) {
           setPemasukan(datas.weekly_income);
         }
       } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
+        console.error("Error fetching monthly income:", error);
       }
     };
 
-    const fetchPengeluaran = async (month: number) => {
+    fetchNewPemasukan();
+  }, [monthPemasukan, pemasukanBulanan]);
+
+  // Subsequent fetch for month changes (Outcome)
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
+    const fetchNewPengeluaran = async () => {
       try {
-        const datas = await pengeluranBulanan(month, () => {});
+        const datas = await pengeluranBulanan(monthPengeluaran);
         if (datas) {
           setPengeluran(datas.weekly_outcome);
         }
       } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
+        console.error("Error fetching monthly outcome:", error);
       }
     };
-    fetchPemasukan(monthPemasukan);
-    fetchPengeluaran(monthPengeluaran);
-  }, [monthPemasukan, monthPengeluaran]);
+
+    fetchNewPengeluaran();
+  }, [monthPengeluaran, pengeluranBulanan]);
+
 
   const handleMonthPemasukanChange = (value: string) => {
     setMonthPemasukan(parseInt(value, 10));

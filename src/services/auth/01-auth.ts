@@ -69,15 +69,16 @@ export async function login(
       };
 
       cookiesObj.set('TOKEN_AUTH', jwtToken, cookieOptions);
-      if(user){
+     if(user){
         cookiesObj.set('USER_NAME', user.name, cookieOptions);
         cookiesObj.set('USER_EMAIL', user.email, cookieOptions);
         cookiesObj.set('USER_ROLE', user.role, cookieOptions);
       }
       return { 
         status: true,
-        message: response.message 
-      };
+        message: response.message,
+        data: user // <-- INI KUNCINYA: Kirim data user kembali ke client
+      }as any;
     } else {
       return { 
         status: false,
@@ -260,5 +261,9 @@ export async function logout() {
 
 export async function deleteCookies(){
   const cookiesObj = await cookies(); 
+  // Hapus seluruh cookie terkait login dengan memberikan maxAge: -1
   cookiesObj.set('TOKEN_AUTH', '', { maxAge: -1, path: '/' });
+  cookiesObj.set('USER_ROLE', '', { maxAge: -1, path: '/' });
+  cookiesObj.set('USER_NAME', '', { maxAge: -1, path: '/' });
+  cookiesObj.set('USER_EMAIL', '', { maxAge: -1, path: '/' });
 }

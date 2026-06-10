@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useRef } from 'react';
 import { Button } from '@components/button';
 import CustomText from '@components/particel/custom-text';
 import DynamicCard from '@components/particel/dynamic-card';
@@ -48,7 +48,7 @@ export default function AddResidentsPage() {
           border={true}
           header={
             <div className="flex p-4 justify-between items-center">
-              <CustomText text={`Tambah {residentString} Baru`} textSize="2xl" />
+              <CustomText text={`Tambah Baru`} textSize="2xl" />
               <div className="flex flex-row items-center space-x-4">
                 <Link href={'/residents'}>
                   <Button

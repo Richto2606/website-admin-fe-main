@@ -19,18 +19,18 @@ import CustomText from '@components/particel/custom-text';
 import { deleteCookies, logout } from '@services/auth/01-auth';
 import { useToast } from '@interfaces/use-toast';
 import { formatMessage } from '@interfaces/data-types';
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation'; // <-- 1. Import useRouter
 import { getCookiesStoreEmail, getCookiesStoreRole, getCookiesStoreUserName } from '@store/cookiesStore';
 
 const RightNavBar = () => {
   const { toast } = useToast();
+  const router = useRouter(); // <-- 2. Deklarasikan router di sini
   const [currentDate, setCurrentDate] = useState(new Date());
   const [username, setUsername] = useState<string>('User Name');
   const [email, setEmail] = useState<string>('email@gmail.com');
   const [role, setRole] = useState<string>('Admin');
 
   useEffect(() => {
-
     const fetchCookies = async () => {
       const storedUsername = await getCookiesStoreUserName();
       setUsername(storedUsername || 'User Name');
@@ -70,16 +70,21 @@ const RightNavBar = () => {
     try {
       const logoutResponse : formatMessage = await logout();
       if(logoutResponse.success){
-        deleteCookies();
-        setTimeout(() => {
-          redirect('/');
-        }, 1000);
+        await deleteCookies(); // Tambahkan await agar cookie benar-benar terhapus dulu
+        
         toast({
           variant: 'success',
           title: 'Logout',
           description: logoutResponse.message
         });
-      }else{
+
+        // 3. Gunakan router.push ke /login
+        setTimeout(() => {
+          router.push('/login'); 
+          router.refresh(); // Refresh agar middleware Next.js sadar cookie sudah hilang
+        }, 1000);
+
+      } else {
         toast({
           variant: 'failed',
           title: 'Logout',
@@ -132,7 +137,8 @@ const RightNavBar = () => {
                 <DropdownMenuItem>
                   <Link href='/profile'>Profile</Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleLogout}>
+                {/* Pastikan memanggil fungsinya seperti ini */}
+                <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
                   Logout
                 </DropdownMenuItem>
             </DropdownMenuContent>

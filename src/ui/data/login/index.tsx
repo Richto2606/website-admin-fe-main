@@ -33,7 +33,6 @@ import { Eye, EyeOff, LogIn } from 'lucide-react';
 export function LoginForm() {
   const router = useRouter();
   const { toast } = useToast();
-  const [pending, setPending] = useState(false);
   const [stateFormData, setStateFormData] = useState<LoginRequest>({
     email: '',
     password: '',
@@ -53,12 +52,12 @@ export function LoginForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setPending(true);
 
     try {
       const formData = new FormData(e.target as HTMLFormElement);
       const formState = await login(stateFormData, formData);
       console.log('FORM STATE:', formState);
+
       if(!formState?.status){
         if (formState?.errors) {
           setStateFormData((prevState) => ({
@@ -72,37 +71,42 @@ export function LoginForm() {
           }));
           toast({
               variant: 'failed',
-              title: 'Login',
+              title: 'Login Gagal',
               description: formState.message,
           });
         }
-      }else if (formState?.status === true) {
-  toast({
-    variant: 'success',
-    title: 'Login',
-    description: formState.message,
-  });
+      } else if (formState?.status === true) {
+        toast({
+          variant: 'success',
+          title: 'Login Berhasil',
+          description: formState.message,
+        });
 
-  router.replace('/dashboard');
-  return;
-}{
-  toast({
-    variant: 'success',
-    title: 'Login',
-    description: formState?.message,
-  });
+        // Tangkap data yang dikirim dari 01-auth.ts
+        const userRole = (formState as any)?.data?.role;
+        const token = (formState as any)?.data?.access_token;
 
-  router.push('/dashboard');
-  router.refresh();
-}
+        if (userRole === 'Admin' || userRole === 'admin') {
+          router.replace('/dashboard');
+          router.refresh();
+        } else {
+          // Proteksi jika token gagal ditangkap
+          if (!token) {
+             console.error("Token kosong:", formState);
+             alert("Gagal mengambil token login.");
+             return;
+          }
+          // Lempar user ke Vite sambil membawa token di URL!
+          window.location.href = `http://localhost:5173/?token=${token}`; 
+        }
+        return;
+      }
     } catch (error) {
       console.error(error);
       setStateFormData((prevState) => ({
         ...prevState,
-        message: 'An error occurred during login.',
+        message: 'Terjadi kesalahan saat login.',
       }));
-    } finally {
-      setPending(false);
     }
   };
 
@@ -111,7 +115,7 @@ export function LoginForm() {
       <CardHeader>
         <CardTitle>Login</CardTitle>
         <CardDescription>
-          Welcome to Login Page Asrama Kutai Karta Negara - Admin
+          Welcome to Login Page Asrama Kutai Kartanegara - Admin
         </CardDescription>
       </CardHeader>
       <CardContent className='space-y-2'>

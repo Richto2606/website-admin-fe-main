@@ -131,6 +131,7 @@ export default function AddResidents({ onSubmit }: { onSubmit: (data: ResidentAd
 
     }
     if(success){
+      setPreviousData(data);
       onSubmit(data);
     }
   };
@@ -292,7 +293,7 @@ export default function AddResidents({ onSubmit }: { onSubmit: (data: ResidentAd
                           <SelectValue placeholder={addResidentForm[4].placeholder}/>
                         </SelectTrigger>
                         <SelectContent>
-                          {originCampuses.map((item, index) => (
+                          {originCampuses.map((item) => (
                             <SelectItem value={item.id} key={item.id}>
                               {item.name}
                             </SelectItem>
@@ -325,7 +326,7 @@ export default function AddResidents({ onSubmit }: { onSubmit: (data: ResidentAd
                           <SelectValue placeholder={addResidentForm[5].placeholder}/>
                         </SelectTrigger>
                         <SelectContent>
-                          {roomNumbers.map((item, index) => (
+                          {roomNumbers.map((item) => (
                             <SelectItem value={item.id} key={item.id}>
                               {item.name}
                             </SelectItem>
@@ -381,7 +382,7 @@ export default function AddResidents({ onSubmit }: { onSubmit: (data: ResidentAd
                           <SelectValue placeholder={addResidentForm[7].placeholder}/>
                         </SelectTrigger>
                         <SelectContent>
-                          {originCities.map((item, index) => (
+                          {originCities.map((item) => (
                             <SelectItem value={item.id} key={item.id}>
                               {item.name}
                             </SelectItem>

@@ -2,7 +2,7 @@
 import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@components/form';
 import { Input } from '@components/input';
-import { ReportEditForm, ResidentSelect } from '@interfaces/data-types';
+import { ReportEditForm } from '@interfaces/data-types';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@components/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@components/popover';
 import { Button } from '@components/button';
@@ -23,7 +23,7 @@ export default function EditReports({
   formData: ReportEditForm | undefined;
   onSubmit: (data: ReportEditForm) => void 
 }) {
-  const [categories, setCategories] = useState<{ value: string; text: string }[]>([
+  const [categories] = useState<{ value: string; text: string }[]>([
     { value: "Pemasukan", text: 'Pemasukan' },
     { value: "Pengeluaran", text: 'Pengeluaran' }
   ]);
@@ -62,6 +62,7 @@ export default function EditReports({
         data.report_evidence = files[0];
       }
     }
+    setPreviousData(data);
     onSubmit(data);
   };
 

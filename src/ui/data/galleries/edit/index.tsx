@@ -13,9 +13,8 @@ import { addGalleryForm } from '@constant/data/gallery';
 import SatellitePrivate from '@services/satellite/private';
 import { CloudUpload, File } from 'lucide-react';
 import { bytesToMb } from '@utils/format';
-import { Button } from '@components/button';
 import { FileValidationResult } from '@interfaces/interface-items';
-import { validateFileImage } from '@utils/fileValidation';
+import { validateFileImage, validateFileTypeImage } from '@utils/fileValidation';
 import { useToast } from '@interfaces/use-toast';
 import { Textarea } from '@components/textarea';
 
@@ -100,6 +99,7 @@ export default function EditGalleries({
       }
     }
     if (success) {
+      setPreviousData(data);
       onSubmit(data);
     }
   };

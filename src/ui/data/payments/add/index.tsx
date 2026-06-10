@@ -88,6 +88,7 @@ export default function AddPayments({ onSubmit }: { onSubmit: (data: PaymentAddF
       }
     }
     if(success){
+      setPreviousData(data);
       onSubmit(data);
     }
   };

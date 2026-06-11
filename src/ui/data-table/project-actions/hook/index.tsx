@@ -16,12 +16,14 @@ export function useQueryClient() {
     onSuccess?: () => void
   ) => {
     setIsLoading(true);
+    console.log(`Attempting to delete: path=${path}, id=${id}`);
 
     try {
       let response = {
         status: false,
-        message: "loading delete..."
+        message: "Proses hapus gagal: Path tidak valid."
       };
+      
       if(path === residentUrl){
         response = await deleteResident(id);
       }else if(path === galleryUrl){
@@ -30,24 +32,34 @@ export function useQueryClient() {
         response = await deletePayment(id);
       }else if(path === reportUrl){
         response = await deleteReport(id);
+      } else {
+        console.error(`Unknown delete path: ${path}`);
       }
-      if (response.status) {
+
+      if (response && response.status === true) {
         toast({
           variant: 'success',
           title: 'Success',
-          description: response.message,
+          description: response.message || 'Data berhasil dihapus.',
         });
         if (onSuccess) onSuccess();
       } else {
-        console.error(response);
+        const errorInfo = {
+          path: path,
+          id: id,
+          response: response,
+          timestamp: new Date().toISOString()
+        };
+        console.error("DEBUG: Delete Failed Detailed Info ->", JSON.stringify(errorInfo, null, 2));
+        
         toast({
           variant: 'failed',
           title: 'Error',
-          description: response.message || 'An error occurred while creating the gallery.',
+          description: response?.message || 'Gagal menghapus data. Silakan coba lagi.',
         });
       }
     } catch (err) {
-      console.error(err);
+      console.error("Delete query exception:", err);
       toast({
         variant: 'failed',
         title: 'Error',

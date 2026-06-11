@@ -216,7 +216,7 @@ export async function refreshAccessToken(token: string): Promise<string | undefi
       const cookiesObj = await cookies(); 
       cookiesObj.set('TOKEN_AUTH', newToken, {
         httpOnly: true,
-        secure: true,
+        secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
         path: '/',
       });

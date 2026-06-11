@@ -5,28 +5,19 @@ import { useRouter } from 'next/navigation';
 
 interface ValidasiTableProps {
   data: any[];
+  token: string; 
 }
 
-export default function ValidasiTable({ data }: ValidasiTableProps) {
+export default function ValidasiTable({ data, token }: ValidasiTableProps) {
   const router = useRouter();
 
   const handleUpdateStatus = async (id: number, status: string) => {
-    // Ambil token dari cookie 'TOKEN_AUTH' yang kamu simpan saat login
-    const getCookie = (name: string) => {
-      const value = `; ${document.cookie}`;
-      const parts = value.split(`; ${name}=`);
-      if (parts.length === 2) return parts.pop()?.split(';').shift();
-    };
-    
-    const token = getCookie('TOKEN_AUTH');
-
     try {
       const res = await fetch(`http://127.0.0.1:8000/api/v1/pendaftaran/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          // Menambahkan Authorization header dengan token
           'Authorization': `Bearer ${token}`, 
           'x-api-key': '881182541952993820593968'
         },
@@ -34,10 +25,10 @@ export default function ValidasiTable({ data }: ValidasiTableProps) {
       });
 
       if (res.ok) {
+        alert(`Status berhasil diubah menjadi ${status}`);
         router.refresh(); 
       } else {
         const errorData = await res.json();
-        console.error("Gagal update:", errorData);
         alert('Gagal: ' + (errorData.message || 'Unauthorized'));
       }
     } catch (error) {
@@ -46,48 +37,62 @@ export default function ValidasiTable({ data }: ValidasiTableProps) {
     }
   };
 
+  if (!data || data.length === 0) {
+    return (
+      <div className="h-64 flex items-center justify-center text-gray-400 bg-transparent">
+        Belum ada data pendaftar baru.
+      </div>
+    );
+  }
+
   return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full bg-white border border-gray-200 rounded-lg">
-        <thead className="bg-gray-50 border-b border-gray-200">
+    // 1. KITA HAPUS bg-background dan border luarnya agar transparan menyatu dengan DynamicCard
+    <div className="w-full overflow-x-auto bg-transparent">
+      <table className="w-full text-sm text-left text-white">
+        {/* 2. Header tabel diubah agar garis bawahnya halus (border-white/10) dan hurufnya normal seperti Kelola Penghuni */}
+        <thead className="border-b border-white/10 text-sm font-medium text-gray-300">
           <tr>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Lengkap</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NIM</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Program Studi</th>
-            <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-            <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+            <th className="h-12 px-4 text-left align-middle font-medium">Nama Lengkap</th>
+            <th className="h-12 px-4 text-left align-middle font-medium">NIM</th>
+            <th className="h-12 px-4 text-left align-middle font-medium">Program Studi</th>
+            <th className="h-12 px-4 text-center align-middle font-medium">Status</th>
+            <th className="h-12 px-4 text-center align-middle font-medium">Aksi</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200">
+        {/* 3. Garis antar baris dibuat tipis transparan */}
+        <tbody className="divide-y divide-white/10">
           {data.map((pendaftar) => (
-            <tr key={pendaftar.id_pendaftaran}>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
+            <tr 
+              key={pendaftar.id_pendaftaran}
+              className="transition-colors hover:bg-white/5"
+            >
+              <td className="p-4 align-middle font-medium">
                 {pendaftar.nama_lengkap}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <td className="p-4 align-middle text-gray-300">
                 {pendaftar.nim}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <td className="p-4 align-middle text-gray-300">
                 {pendaftar.program_studi}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-center">
-                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                  ${pendaftar.status_pendaftaran === 'Menunggu' ? 'bg-yellow-100 text-yellow-800' : 
-                    pendaftar.status_pendaftaran === 'Diterima' ? 'bg-green-100 text-green-800' : 
-                    'bg-red-100 text-red-800'}`}>
+              <td className="p-4 align-middle text-center">
+                <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-md 
+                  ${pendaftar.status_pendaftaran === 'Menunggu' ? 'bg-yellow-500/20 text-yellow-500' : 
+                    pendaftar.status_pendaftaran === 'Diterima' ? 'bg-green-500/20 text-green-400' : 
+                    'bg-red-500/20 text-red-400'}`}>
                   {pendaftar.status_pendaftaran || 'Menunggu'}
                 </span>
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium space-x-2">
+              <td className="p-4 align-middle text-center text-sm font-medium space-x-2">
                 <button 
                   onClick={() => handleUpdateStatus(pendaftar.id_pendaftaran, 'Diterima')}
-                  className="text-white bg-green-600 hover:bg-green-700 px-3 py-1 rounded transition"
+                  className="text-white bg-green-600 hover:bg-green-500 px-4 py-1.5 rounded-md transition"
                 >
                   Terima
                 </button>
                 <button 
                   onClick={() => handleUpdateStatus(pendaftar.id_pendaftaran, 'Ditolak')}
-                  className="text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded transition"
+                  className="text-white bg-red-600 hover:bg-red-500 px-4 py-1.5 rounded-md transition"
                 >
                   Tolak
                 </button>

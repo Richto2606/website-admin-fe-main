@@ -1,77 +1,87 @@
 import { chartIncomeData, chartOutcomeData, formatMessage, StaticData} from '@interfaces/data-types';
 import SatellitePrivate from '@services/satellite/private';
-import api from '@/lib/axios';
+import { AxiosRequestConfig } from 'axios';
 
-export async function getResidentActive(): Promise<formatMessage<StaticData>> {
+export async function getResidentActive(signal?: AbortSignal): Promise<formatMessage<StaticData>> {
   try {
-
-    const res = await SatellitePrivate.get<formatMessage<StaticData>>('/residents/grafik/active');
+    const config: AxiosRequestConfig = signal ? { signal } : {};
+    const res = await SatellitePrivate.get<formatMessage<StaticData>>('/residents/grafik/active', config);
     return  res.data;
-  } catch (error) {
-    console.error('Error fetching datas:', error);
+  } catch (error: any) {
+    if (error.name !== 'CanceledError' && error.response?.status !== 401) {
+      console.error('Error fetching datas:', error);
+    }
     return {
       success: false,
-      message: 'An unexpected error occurred.',
+      message: error.response?.data?.message || 'An unexpected error occurred.',
       data: null,
     };
   }
 }
 
-export async function getKamarTerpakai(): Promise<formatMessage<StaticData>> {
+export async function getKamarTerpakai(signal?: AbortSignal): Promise<formatMessage<StaticData>> {
   try {
-
-    const res = await SatellitePrivate.get<formatMessage<StaticData>>('/rooms/grafik/occupied');
+    const config: AxiosRequestConfig = signal ? { signal } : {};
+    const res = await SatellitePrivate.get<formatMessage<StaticData>>('/rooms/grafik/occupied', config);
     return  res.data;
-  } catch (error) {
-    console.error('Error fetching datas:', error);
+  } catch (error: any) {
+    if (error.name !== 'CanceledError' && error.response?.status !== 401) {
+      console.error('Error fetching datas:', error);
+    }
     return {
       success: false,
-      message: 'An unexpected error occurred.',
+      message: error.response?.data?.message || 'An unexpected error occurred.',
       data: null,
     };
   }
 }
 
-export async function getPemasukanBulanan(bulan: number): Promise<formatMessage<chartIncomeData>> {
+export async function getPemasukanBulanan(bulan: number, signal?: AbortSignal): Promise<formatMessage<chartIncomeData>> {
   try {
-
-    const res = await SatellitePrivate.get<formatMessage<chartIncomeData>>(`/income/grafik/${bulan}`);
+    const config: AxiosRequestConfig = signal ? { signal } : {};
+    const res = await SatellitePrivate.get<formatMessage<chartIncomeData>>(`/income/grafik/${bulan}`, config);
     return  res.data;
-  } catch (error) {
-    console.error('Error fetching datas:', error);
+  } catch (error: any) {
+    if (error.name !== 'CanceledError' && error.response?.status !== 401) {
+      console.error('Error fetching datas:', error);
+    }
     return {
       success: false,
-      message: 'An unexpected error occurred.',
+      message: error.response?.data?.message || 'An unexpected error occurred.',
       data: null,
     };
   }
 }
 
-export async function getPengeluaranBulanan(bulan: number): Promise<formatMessage<chartOutcomeData>> {
+export async function getPengeluaranBulanan(bulan: number, signal?: AbortSignal): Promise<formatMessage<chartOutcomeData>> {
   try {
-
-    const res = await SatellitePrivate.get<formatMessage<chartOutcomeData>>(`/outcome/grafik/${bulan}`);
+    const config: AxiosRequestConfig = signal ? { signal } : {};
+    const res = await SatellitePrivate.get<formatMessage<chartOutcomeData>>(`/outcome/grafik/${bulan}`, config);
     return  res.data;
-  } catch (error) {
-    console.error('Error fetching datas:', error);
+  } catch (error: any) {
+    if (error.name !== 'CanceledError' && error.response?.status !== 401) {
+      console.error('Error fetching datas:', error);
+    }
     return {
       success: false,
-      message: 'An unexpected error occurred.',
+      message: error.response?.data?.message || 'An unexpected error occurred.',
       data: null,
     };
   }
 }
 
-export async function getSinkronisasiPayment(): Promise<formatMessage<StaticData>> {
+export async function getSinkronisasiPayment(signal?: AbortSignal): Promise<formatMessage<StaticData>> {
   try {
-
-    const res = await SatellitePrivate.get<formatMessage<StaticData>>('/payments/grafik/sync');
+    const config: AxiosRequestConfig = signal ? { signal } : {};
+    const res = await SatellitePrivate.get<formatMessage<StaticData>>('/payments/grafik/sync', config);
     return  res.data;
-  } catch (error) {
-    console.error('Error fetching datas:', error);
+  } catch (error: any) {
+    if (error.name !== 'CanceledError' && error.response?.status !== 401) {
+      console.error('Error fetching datas:', error);
+    }
     return {
       success: false,
-      message: 'An unexpected error occurred.',
+      message: error.response?.data?.message || 'An unexpected error occurred.',
       data: null,
     };
   }

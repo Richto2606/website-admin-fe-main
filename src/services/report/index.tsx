@@ -1,6 +1,6 @@
 import { ExportReportForm, formatMessage, GenerateReport, Report, ReportAddForm, ReportEditForm} from '@interfaces/data-types';
 import SatellitePrivate from '@services/satellite/private';
-import { AxiosError } from 'axios';
+import axios, { AxiosError } from 'axios';
 
 export async function putSyncPayment(): Promise<formatMessage<null>> {
   try {
@@ -161,28 +161,25 @@ export async function putReport(formData: ReportEditForm, id: string | number) {
 
 export async function deleteReport(id: string | number) {
   try {
-    const res = await SatellitePrivate.delete<formatMessage<null>>(
+    const res = await SatellitePrivate.delete<any>(
       `/reports/${id}`
     );
-    const response =  res.data;
     return {
-      status: response.success,
-      message: response.message,
+      status: res.status >= 200 && res.status < 300,
+      message: res.data?.message || 'Laporan berhasil dihapus',
     };
   } catch (error) {
-    if (error instanceof AxiosError) {
-      const message = error.response?.data?.message || 'An error occurred.';
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError<any>;
       return {
         status: false,
-        message: message || 'Unexpected server error.',
-      };
-    } else {
-      console.error('Unexpected error:', error);
-      return {
-        status: false,
-        message: 'An unexpected error occurred.',
+        message: axiosError.response?.data?.message || axiosError.message || 'Gagal menghapus laporan (Server Error)',
       };
     }
+    return {
+      status: false,
+      message: 'Gagal menghapus laporan (Unexpected Error)',
+    };
   }
 }
 

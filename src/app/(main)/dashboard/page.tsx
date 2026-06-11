@@ -51,16 +51,20 @@ export default function DashboardPage() {
   // Initial fetch for all data
   useEffect(() => {
     if (hasFetchedInitial.current) return;
+    const controller = new AbortController();
 
     const fetchInitialData = async () => {
       try {
         const [resResidents, resKamar, resPemasukan, resPengeluaran, resSinkronisasi] = await Promise.all([
-          activeResidents(),
-          kamarTerpakai(),
-          pemasukanBulanan(monthPemasukan),
-          pengeluranBulanan(monthPengeluaran),
-          sinkronisasiPayment()
+          activeResidents(undefined, controller.signal),
+          kamarTerpakai(undefined, controller.signal),
+          pemasukanBulanan(monthPemasukan, undefined, controller.signal),
+          pengeluranBulanan(monthPengeluaran, undefined, controller.signal),
+          sinkronisasiPayment(undefined, controller.signal)
         ]);
+
+        // Jika salah satu request mengembalikan null karena 401 atau dibatalkan, jangan lanjutkan set state
+        if (controller.signal.aborted) return;
 
         if (resResidents) {
           setPenghuni([
@@ -86,30 +90,43 @@ export default function DashboardPage() {
           setSinkronisasi(resSinkronisasi.data_active);
         }
         hasFetchedInitial.current = true;
-      } catch (error) {
-        console.error("Error fetching initial dashboard data:", error);
+      } catch (error: any) {
+        if (error.name !== 'CanceledError') {
+          console.error("Error fetching initial dashboard data:", error);
+        }
       }
     };
 
     fetchInitialData();
+
+    return () => {
+      controller.abort();
+    };
   }, [activeResidents, kamarTerpakai, pemasukanBulanan, pengeluranBulanan, sinkronisasiPayment, monthPemasukan, monthPengeluaran]);
 
   // Subsequent fetch for month changes (Income)
   useEffect(() => {
     if (isInitialMount.current) return;
+    const controller = new AbortController();
     
     const fetchNewPemasukan = async () => {
       try {
-        const datas = await pemasukanBulanan(monthPemasukan);
-        if (datas) {
+        const datas = await pemasukanBulanan(monthPemasukan, undefined, controller.signal);
+        if (datas && !controller.signal.aborted) {
           setPemasukan(datas.weekly_income);
         }
-      } catch (error) {
-        console.error("Error fetching monthly income:", error);
+      } catch (error: any) {
+        if (error.name !== 'CanceledError') {
+          console.error("Error fetching monthly income:", error);
+        }
       }
     };
 
     fetchNewPemasukan();
+
+    return () => {
+      controller.abort();
+    };
   }, [monthPemasukan, pemasukanBulanan]);
 
   // Subsequent fetch for month changes (Outcome)
@@ -118,19 +135,26 @@ export default function DashboardPage() {
       isInitialMount.current = false;
       return;
     }
+    const controller = new AbortController();
 
     const fetchNewPengeluaran = async () => {
       try {
-        const datas = await pengeluranBulanan(monthPengeluaran);
-        if (datas) {
+        const datas = await pengeluranBulanan(monthPengeluaran, undefined, controller.signal);
+        if (datas && !controller.signal.aborted) {
           setPengeluran(datas.weekly_outcome);
         }
-      } catch (error) {
-        console.error("Error fetching monthly outcome:", error);
+      } catch (error: any) {
+        if (error.name !== 'CanceledError') {
+          console.error("Error fetching monthly outcome:", error);
+        }
       }
     };
 
     fetchNewPengeluaran();
+
+    return () => {
+      controller.abort();
+    };
   }, [monthPengeluaran, pengeluranBulanan]);
 
 

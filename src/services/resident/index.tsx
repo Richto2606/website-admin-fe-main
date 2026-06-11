@@ -1,6 +1,6 @@
 import { formatMessage, ResidentAddForm, Resident, ResidentEditForm } from '@interfaces/data-types';
 import SatellitePrivate from '@services/satellite/private';
-import { AxiosError } from 'axios';
+import axios, { AxiosError } from 'axios';
 
 export async function postResident(formData: ResidentAddForm) {
   try {
@@ -106,27 +106,24 @@ export async function putResident(formData: ResidentEditForm, id: string | numbe
 
 export async function deleteResident(id: string | number) {
   try {
-    const res = await SatellitePrivate.delete<formatMessage<null>>(
+    const res = await SatellitePrivate.delete<any>(
       `/residents/${id}`
     );
-    const response =  res.data;
     return {
-      status: response.success,
-      message: response.message,
+      status: res.status >= 200 && res.status < 300,
+      message: res.data?.message || 'Penghuni berhasil dihapus',
     };
   } catch (error) {
-    if (error instanceof AxiosError) {
-      const message = error.response?.data?.message || 'An error occurred.';
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError<any>;
       return {
         status: false,
-        message: message || 'Unexpected server error.',
-      };
-    } else {
-      console.error('Unexpected error:', error);
-      return {
-        status: false,
-        message: 'An unexpected error occurred.',
+        message: axiosError.response?.data?.message || axiosError.message || 'Gagal menghapus penghuni (Server Error)',
       };
     }
+    return {
+      status: false,
+      message: 'Gagal menghapus penghuni (Unexpected Error)',
+    };
   }
 }

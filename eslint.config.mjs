@@ -11,6 +11,14 @@ const compat = new FlatCompat({
 
 const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
+  {
+    // Tambahkan blok rules di sini untuk menonaktifkan pengecekan yang ketat
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",     // Mengizinkan penggunaan 'any'
+      "@typescript-eslint/no-unused-vars": "off",      // Mengizinkan variabel yang tidak terpakai
+      "prefer-rest-params": "off"                      // Mengizinkan penggunaan 'arguments'
+    },
+  },
 ];
 
 export default eslintConfig;

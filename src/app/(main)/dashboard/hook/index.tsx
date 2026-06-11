@@ -8,20 +8,23 @@ export function useQueryClient() {
   const [isLoading, setIsLoading] = useState(false);
 
   const activeResidents = useCallback(async (
-    onSuccess?: () => void
+    onSuccess?: () => void,
+    signal?: AbortSignal
   ) : Promise<StaticData | null> => {
     setIsLoading(true);
 
     try {
-      const response = await getResidentActive();
+      const response = await getResidentActive(signal);
       if (response?.success && response.data) {
         if (onSuccess) onSuccess();
         return response.data;
       } else {
         return null; 
       }
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      if (err.name !== 'CanceledError' && err.response?.status !== 401) {
+        console.error(err);
+      }
       return null; 
     } finally {
       setIsLoading(false);
@@ -29,20 +32,23 @@ export function useQueryClient() {
   }, []);
 
   const kamarTerpakai = useCallback(async (
-    onSuccess?: () => void
+    onSuccess?: () => void,
+    signal?: AbortSignal
   ) : Promise<StaticData | null> => {
     setIsLoading(true);
 
     try {
-      const response = await getKamarTerpakai();
+      const response = await getKamarTerpakai(signal);
       if (response?.success && response.data) {
         if (onSuccess) onSuccess();
         return response.data;
       } else {
         return null; 
       }
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      if (err.name !== 'CanceledError' && err.response?.status !== 401) {
+        console.error(err);
+      }
       return null; 
     } finally {
       setIsLoading(false);
@@ -51,20 +57,23 @@ export function useQueryClient() {
 
   const pemasukanBulanan = useCallback(async (
     bulan: number, 
-    onSuccess?: () => void
+    onSuccess?: () => void,
+    signal?: AbortSignal
   ) : Promise<chartIncomeData | null> => {
     setIsLoading(true);
 
     try {
-      const response = await getPemasukanBulanan(bulan);
+      const response = await getPemasukanBulanan(bulan, signal);
       if (response?.success && response.data) {
         if (onSuccess) onSuccess();
         return response.data;
       } else {
         return null; 
       }
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      if (err.name !== 'CanceledError' && err.response?.status !== 401) {
+        console.error(err);
+      }
       return null; 
     } finally {
       setIsLoading(false);
@@ -73,20 +82,23 @@ export function useQueryClient() {
 
   const pengeluranBulanan = useCallback(async (
     bulan: number, 
-    onSuccess?: () => void
+    onSuccess?: () => void,
+    signal?: AbortSignal
   ) : Promise<chartOutcomeData | null> => {
     setIsLoading(true);
 
     try {
-      const response = await getPengeluaranBulanan(bulan);
+      const response = await getPengeluaranBulanan(bulan, signal);
       if (response?.success && response.data) {
         if (onSuccess) onSuccess();
         return response.data;
       } else {
         return null; 
       }
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      if (err.name !== 'CanceledError' && err.response?.status !== 401) {
+        console.error(err);
+      }
       return null; 
     } finally {
       setIsLoading(false);
@@ -94,20 +106,23 @@ export function useQueryClient() {
   }, []);
 
   const sinkronisasiPayment = useCallback(async (
-    onSuccess?: () => void
+    onSuccess?: () => void,
+    signal?: AbortSignal
   ) : Promise<StaticData | null> => {
     setIsLoading(true);
 
     try {
-      const response = await getSinkronisasiPayment();
+      const response = await getSinkronisasiPayment(signal);
       if (response?.success && response.data) {
         if (onSuccess) onSuccess();
         return response.data;
       } else {
         return null; 
       }
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      if (err.name !== 'CanceledError' && err.response?.status !== 401) {
+        console.error(err);
+      }
       return null; 
     } finally {
       setIsLoading(false);

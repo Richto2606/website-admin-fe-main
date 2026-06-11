@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { LoginForm } from "@ui/data/login";
 import { 
   Tabs, 

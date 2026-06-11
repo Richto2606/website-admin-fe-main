@@ -1,5 +1,5 @@
 'use client';
-
+export const runtime = 'edge';
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@components/button';
 import CustomText from '@components/particel/custom-text';

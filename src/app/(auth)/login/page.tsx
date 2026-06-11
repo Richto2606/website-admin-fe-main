@@ -1,4 +1,5 @@
 export const dynamic = 'force-dynamic';
+export const runtime = 'edge';
 import { LoginForm } from "@ui/data/login";
 import { 
   Tabs, 

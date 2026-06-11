@@ -22,6 +22,7 @@ export interface RadioButtonProps {
   ariaLabel: string;
   onValueChange?: (value: string) => void;
   className?: string;
+  disabled?: boolean;
 }
 
 export interface DataTableProps<TData, TValue> {

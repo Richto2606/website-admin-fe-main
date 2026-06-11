@@ -14,7 +14,8 @@ import EditPayments from '@ui/data/payments/edit';
 
 export default function EditPaymentsPage() {
   const router = useRouter();
-  const { id } = useParams(); 
+  const params = useParams();
+  const id = params?.id; 
   const validId = id && typeof id === 'string' ? id : ''; 
   const { detailPayment, updatePayment } = useQueryClient();
   const [isLoading, setIsLoading] = useState(true);

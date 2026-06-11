@@ -12,19 +12,19 @@ export function ContainerProvider({ children, ...props }: ThemeProviderProps) {
     setMounted(true);
 
     const originalRemoveChild = Node.prototype.removeChild;
-    Node.prototype.removeChild = function (child) {
+    (Node.prototype as any).removeChild = function (child: Node) {
       if (child.parentNode !== this) {
         return child;
       }
-      return originalRemoveChild.apply(this, arguments);
+      return originalRemoveChild.apply(this, arguments as any);
     };
 
     const originalInsertBefore = Node.prototype.insertBefore;
-    Node.prototype.insertBefore = function (newNode, referenceNode) {
+    (Node.prototype as any).insertBefore = function (newNode: Node, referenceNode: Node | null) {
       if (referenceNode && referenceNode.parentNode !== this) {
         return newNode;
       }
-      return originalInsertBefore.apply(this, arguments);
+      return originalInsertBefore.apply(this, arguments as any);
     };
   }, []);
 

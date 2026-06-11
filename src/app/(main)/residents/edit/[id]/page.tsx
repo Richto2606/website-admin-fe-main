@@ -14,7 +14,8 @@ import { useQueryClient } from '../../hook';
 
 export default function EditResidentsPage() {
   const router = useRouter(); 
-  const { id } = useParams(); 
+  const params = useParams();
+  const id = params?.id; 
   const validId = id && typeof id === 'string' ? id : ''; 
   const { detailResident, updateResident } = useQueryClient();
   const [isLoading, setIsLoading] = useState(true);

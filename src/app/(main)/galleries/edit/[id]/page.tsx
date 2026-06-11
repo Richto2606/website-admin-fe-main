@@ -14,7 +14,8 @@ import EditGalleries from '@ui/data/galleries/edit';
 
 export default function EditGalleriesPage() {
   const router = useRouter(); 
-  const { id } = useParams(); 
+  const params = useParams();
+  const id = params?.id; 
   const validId = id && typeof id === 'string' ? id : ''; 
   const { detailGallery, updateGallery } = useQueryClient();
   const [isLoading, setIsLoading] = useState(true);

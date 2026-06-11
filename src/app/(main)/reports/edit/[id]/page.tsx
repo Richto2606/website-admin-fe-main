@@ -14,7 +14,8 @@ import EditReports from '@ui/data/report/edit';
 
 export default function EditReportPage() {
   const router = useRouter();
-  const { id } = useParams(); 
+  const params = useParams();
+  const id = params?.id; 
   const validId = id && typeof id === 'string' ? id : ''; 
   const { detailReport, updateReport } = useQueryClient();
   const [isLoading, setIsLoading] = useState(true);

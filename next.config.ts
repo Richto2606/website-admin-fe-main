@@ -26,5 +26,5 @@ const nextConfig: NextConfig = {
         ignoreBuildErrors: true,
     },
 };
-module.exports = nextConfig;
+
 export default nextConfig;

@@ -139,9 +139,14 @@ export async function deletePayment(id: string | number) {
     const res = await SatellitePrivate.delete<any>(
       `/payments/${id}`
     );
+    
+    // Periksa apakah HTTP status sukses DAN isi respon juga menyatakan sukses
+    const isSuccess = (res.status >= 200 && res.status < 300) && 
+                      (res.data?.success !== false && res.data?.status !== false);
+
     return {
-      status: res.status >= 200 && res.status < 300,
-      message: res.data?.message || 'Pembayaran berhasil dihapus',
+      status: isSuccess,
+      message: res.data?.message || (isSuccess ? 'Pembayaran berhasil dihapus' : 'Gagal menghapus pembayaran'),
     };
   } catch (error) {
     if (axios.isAxiosError(error)) {

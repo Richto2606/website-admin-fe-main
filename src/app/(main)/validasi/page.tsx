@@ -1,3 +1,4 @@
+export const runtime = 'edge';
 import React from 'react';
 import ValidasiTable from './table';
 import { cookies } from 'next/headers';

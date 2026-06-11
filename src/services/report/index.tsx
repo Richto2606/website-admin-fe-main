@@ -164,9 +164,14 @@ export async function deleteReport(id: string | number) {
     const res = await SatellitePrivate.delete<any>(
       `/reports/${id}`
     );
+    
+    // Periksa apakah HTTP status sukses DAN isi respon juga menyatakan sukses
+    const isSuccess = (res.status >= 200 && res.status < 300) && 
+                      (res.data?.success !== false && res.data?.status !== false);
+
     return {
-      status: res.status >= 200 && res.status < 300,
-      message: res.data?.message || 'Laporan berhasil dihapus',
+      status: isSuccess,
+      message: res.data?.message || (isSuccess ? 'Laporan berhasil dihapus' : 'Gagal menghapus laporan'),
     };
   } catch (error) {
     if (axios.isAxiosError(error)) {

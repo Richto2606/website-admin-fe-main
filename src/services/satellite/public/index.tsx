@@ -2,7 +2,7 @@ import { formatMessage } from "@interfaces/data-types";
 import axios, { AxiosResponse } from "axios";
 
 const SatellitePublic = axios.create({
-  baseURL: 'https://api.asramaputrakukar.my.id/api/v1',
+  baseURL: 'https://asramaputrakukar.my.id/api/v1',
   timeout: 30000,
   headers: {
     "Content-Type": "application/json",

@@ -12,7 +12,7 @@ export default function ValidasiTable({ data, token }: ValidasiTableProps) {
   const router = useRouter();
   
   // Mengambil baseURL dari environment variable
-  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.asramaputrakukar.my.id/api/v1';
+  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://asramaputrakukar.my.id/api/v1';
 
   const handleUpdateStatus = async (id: number, status: string) => {
     try {

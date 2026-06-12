@@ -3,7 +3,7 @@ const nextConfig = {
   reactStrictMode: true,
   env: {
     // 💡 UBAH SEMUA KE URL PRODUKSI ANDA
-    NEXT_PUBLIC_API_BASE_URL: "https://api.asramaputrakukar.my.id/api/v1",
+    NEXT_PUBLIC_API_BASE_URL: "https://asramaputrakukar.my.id/api/v1",
     NEXT_PUBLIC_BASE_URL: "https://api.asramaputrakukar.my.id",
     NEXT_PUBLIC_API_KEY: "881182541952993820593968",
     NEXT_PUBLIC_NODE_ENV: "production" // Ubah ke production

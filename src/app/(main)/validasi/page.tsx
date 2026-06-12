@@ -11,7 +11,7 @@ async function getPendaftar() {
 
   try {
     // 💡 UBAH URL KE DOMAIN API PRODUKSI
-    const res = await fetch('https://api.asramaputrakukar.my.id/api/v1/pendaftaran', {
+    const res = await fetch('https://asramaputrakukar.my.id/api/v1/pendaftaran', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

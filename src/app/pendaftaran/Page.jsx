@@ -22,7 +22,7 @@
 
     try {
       // 💡 UBAH URL KE DOMAIN PRODUKSI ANDA
-      const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.asramaputrakukar.my.id/api/v1';
+      const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://asramaputrakukar.my.id/api/v1';
       
       const response = await fetch(`${BASE_URL}/pendaftaran`, {
         method: 'POST',

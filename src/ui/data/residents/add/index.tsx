@@ -1,3 +1,5 @@
+'use client';
+
 import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@components/form';
 import { Input } from '@components/input';
@@ -12,8 +14,9 @@ import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { Calendar } from '@components/calendar';
 import { useEffect, useState } from 'react';
-import { cn } from '@lib/utils'
-import SatellitePrivate from '@services/satellite/private';
+import { cn } from '@lib/utils';
+//  Mengganti SatellitePrivate dengan instance api kustom yang terhubung ke Environment Variables Next.js
+import api from '@/lib/axios';
 
 export default function AddResidents({ onSubmit }: { onSubmit: (data: ResidentAddForm) => void }) {
   const { toast } = useToast();
@@ -40,11 +43,13 @@ export default function AddResidents({ onSubmit }: { onSubmit: (data: ResidentAd
 
   useEffect(() => {
     setIsMounted(true);
+    
     const fetchOriginCampus = async () => {
       try {
-        const res = await SatellitePrivate.get<formatMessage<OriginCampus[]>>('/origin-campuses');
+        // Menggunakan api.get menggantikan SatellitePrivate.get
+        const res = await api.get<formatMessage<OriginCampus[]>>('/origin-campuses');
         const response = res.data;
-        const originCampuses =  response.data || [];
+        const originCampuses = response.data || [];
         if (response.success === true) {
           setOriginCampuses(originCampuses);
         }
@@ -55,9 +60,10 @@ export default function AddResidents({ onSubmit }: { onSubmit: (data: ResidentAd
 
     const fetchRoomNumbers = async () => {
       try {
-        const res = await SatellitePrivate.get<formatMessage<RoomNumbers[]>>('/room-numbers');
+        // Menggunakan api.get menggantikan SatellitePrivate.get
+        const res = await api.get<formatMessage<RoomNumbers[]>>('/room-numbers');
         const response = res.data;
-        const roomNumbers =  response.data || [];
+        const roomNumbers = response.data || [];
         if (response.success === true) {
           setRoomNumbers(roomNumbers);
         }
@@ -68,9 +74,10 @@ export default function AddResidents({ onSubmit }: { onSubmit: (data: ResidentAd
 
     const fetchOriginCtiy = async () => {
       try {
-        const res = await SatellitePrivate.get<formatMessage<OriginCity[]>>('/origin-cities');
+        // Menggunakan api.get menggantikan SatellitePrivate.get
+        const res = await api.get<formatMessage<OriginCity[]>>('/origin-cities');
         const response = res.data;
-        const originCities =  response.data || [];
+        const originCities = response.data || [];
         if (response.success === true) {
           setOriginCities(originCities);
         }
@@ -96,9 +103,9 @@ export default function AddResidents({ onSubmit }: { onSubmit: (data: ResidentAd
     let success = true;
 
     if (hasChanged) {
-      if(phone_number.length < 15 ){
-        if(phone_number.length > 2  && phone_number.length < 15 ){
-          if(!phone_number.includes("62")){
+      if (phone_number.length < 15) {
+        if (phone_number.length > 2 && phone_number.length < 15) {
+          if (!phone_number.includes("62")) {
             toast({
               variant: 'warning',
               title: 'Nomor Telepon',
@@ -106,7 +113,7 @@ export default function AddResidents({ onSubmit }: { onSubmit: (data: ResidentAd
             });
           }
         }
-      }else{
+      } else {
         toast({
           variant: 'warning',
           title: 'Nomor Telepon',
@@ -121,16 +128,15 @@ export default function AddResidents({ onSubmit }: { onSubmit: (data: ResidentAd
           description: 'Harap menggunakan angka untuk umur!',
         });
         success = false;
-      }else{
+      } else {
         data.age = parseInt(age.toString(), 10);
       }
 
       if (birth_date_convert) {
         data.birth_date = format(new Date(birth_date_convert), 'yyyy-MM-dd');
       }
-
     }
-    if(success){
+    if (success) {
       setPreviousData(data);
       onSubmit(data);
     }
@@ -141,7 +147,7 @@ export default function AddResidents({ onSubmit }: { onSubmit: (data: ResidentAd
   return (
     <div className="flex p-4 justify-between">
       <Form {...form}>
-        <form className="space-y-4  w-full">
+        <form className="space-y-4 w-full">
           <div className='flex flex-col md:flex-row md:space-x-4'>
             <div className="md:w-1/2">
               {/* Name Field */}
@@ -213,8 +219,8 @@ export default function AddResidents({ onSubmit }: { onSubmit: (data: ResidentAd
                             )}
                           >
                             {field.value
-                            ? format(typeof field.value === "number" ? new Date(field.value) : field.value, "dd MMMM yyyy")
-                            : <span>Pick a date</span> }
+                              ? format(typeof field.value === "number" ? new Date(field.value) : field.value, "dd MMMM yyyy")
+                              : <span>Pick a date</span>}
                             <CalendarIcon className="size-4" />
                           </Button>
                         </PopoverTrigger>
@@ -369,29 +375,29 @@ export default function AddResidents({ onSubmit }: { onSubmit: (data: ResidentAd
             name="origin_city_id"
             render={({ field }) => (
               <FormItem>
-                    <FormLabel className="text-xs">{addResidentForm[7].label}</FormLabel>
-                    <FormControl>
-                      <Select value={field.value} onValueChange={(value) => {
-                        field.onChange(value);
-                        handleFormChange(form.getValues());
-                      }}>
-                        <SelectTrigger
-                          aria-label={`Origin City`}
-                          className="bg-background"
-                        >
-                          <SelectValue placeholder={addResidentForm[7].placeholder}/>
-                        </SelectTrigger>
-                        <SelectContent>
-                          {originCities.map((item) => (
-                            <SelectItem value={item.id} key={item.id}>
-                              {item.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                <FormLabel className="text-xs">{addResidentForm[7].label}</FormLabel>
+                <FormControl>
+                  <Select value={field.value} onValueChange={(value) => {
+                    field.onChange(value);
+                    handleFormChange(form.getValues());
+                  }}>
+                    <SelectTrigger
+                      aria-label={`Origin City`}
+                      className="bg-background"
+                    >
+                      <SelectValue placeholder={addResidentForm[7].placeholder}/>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {originCities.map((item) => (
+                        <SelectItem value={item.id} key={item.id}>
+                          {item.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
             )}
           />
         </form>

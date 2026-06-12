@@ -40,6 +40,7 @@ export default function AddResidentsPage() {
   }
 
   const breadcrumbs = createTitleAndBreadcrumbs(residentString, residentUrl);
+  
   return (
     <>
       <div className="container max-w-screen-xl mx-auto px-4">

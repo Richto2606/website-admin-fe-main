@@ -1,5 +1,6 @@
-"use client"; // Wajib di baris pertama tanpa ada kode apa pun di atasnya
+"use client";
 
+// Wajib di baris pertama tanpa ada kode apa pun di atasnya
 import React, { useState } from 'react';
 
 export default function Pendaftaran() {

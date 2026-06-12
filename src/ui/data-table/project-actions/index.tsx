@@ -45,6 +45,7 @@ export function ProjectActions<TData>({ row, path }: ProjectActionsProps<TData>)
     }
   };
 
+  
   const titleName = deleteItem.find(item => item.key === path) || deleteItem.find(item => item.key === 'not-found');
 
   return (

@@ -10,22 +10,6 @@ export function ContainerProvider({ children, ...props }: ThemeProviderProps) {
 
   useEffect(() => {
     setMounted(true);
-
-    const originalRemoveChild = Node.prototype.removeChild;
-    (Node.prototype as any).removeChild = function (child: Node) {
-      if (child.parentNode !== this) {
-        return child;
-      }
-      return originalRemoveChild.apply(this, arguments as any);
-    };
-
-    const originalInsertBefore = Node.prototype.insertBefore;
-    (Node.prototype as any).insertBefore = function (newNode: Node, referenceNode: Node | null) {
-      if (referenceNode && referenceNode.parentNode !== this) {
-        return newNode;
-      }
-      return originalInsertBefore.apply(this, arguments as any);
-    };
   }, []);
 
   if (!mounted) {

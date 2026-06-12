@@ -18,7 +18,7 @@ const processQueue = (error: any, token: string | null = null) => {
 };
 
 const SatellitePrivate: AxiosInstance = axios.create({
-  baseURL: process.env.NEXT_BASE_URL_API || 'http://127.0.0.1:8000/api/v1',
+  baseURL: process.env.NEXT_BASE_URL_API || 'https://api.asramaputrakukar.my.id/api/v1',
   timeout: 30000,
   headers: {
     "Content-Type": "application/json",

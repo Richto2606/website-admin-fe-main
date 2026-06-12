@@ -10,13 +10,15 @@ async function getPendaftar() {
   const token = cookiesObj.get('TOKEN_AUTH')?.value;
 
   try {
-    const res = await fetch('http://127.0.0.1:8000/api/v1/pendaftaran', {
+    // 💡 UBAH URL KE DOMAIN API PRODUKSI
+    const res = await fetch('https://api.asramaputrakukar.my.id/api/v1/pendaftaran', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'Authorization': `Bearer ${token}`, 
-        'x-api-key': '881182541952993820593968'
+        // 💡 GUNAKAN VARIABEL LINGKUNGAN AGAR LEBIH AMAN
+        'x-api-key': process.env.NEXT_PUBLIC_API_KEY || '881182541952993820593968'
       },
       cache: 'no-store'
     });

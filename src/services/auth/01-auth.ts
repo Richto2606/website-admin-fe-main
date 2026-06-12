@@ -62,14 +62,14 @@ export async function login(
     if (jwtToken) {
       const cookiesObj = await cookies(); 
       const cookieOptions = {
-        httpOnly: true,
+        httpOnly: false, // <-- UBAH KE FALSE AGAR AXIOS BISA MEMBACA TOKEN
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax' as const,
         path: '/',
       };
 
       cookiesObj.set('TOKEN_AUTH', jwtToken, cookieOptions);
-     if(user){
+      if(user){
         cookiesObj.set('USER_NAME', user.name, cookieOptions);
         cookiesObj.set('USER_EMAIL', user.email, cookieOptions);
         cookiesObj.set('USER_ROLE', user.role, cookieOptions);
@@ -77,8 +77,8 @@ export async function login(
       return { 
         status: true,
         message: response.message,
-        data: user // <-- INI KUNCINYA: Kirim data user kembali ke client
-      }as any;
+        data: user 
+      } as any;
     } else {
       return { 
         status: false,
@@ -215,7 +215,7 @@ export async function refreshAccessToken(token: string): Promise<string | undefi
     if (newToken) {
       const cookiesObj = await cookies(); 
       cookiesObj.set('TOKEN_AUTH', newToken, {
-        httpOnly: true,
+        httpOnly: false, // <-- UBAH KE FALSE AGAR AXIOS BISA MEMBACA TOKEN
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
         path: '/',

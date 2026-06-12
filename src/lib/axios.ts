@@ -13,15 +13,17 @@ const api = axios.create({
 // Interceptor: Menambahkan token secara otomatis ke setiap request
 api.interceptors.request.use(
   (config) => {
-    // Ambil token dari cookie dengan regex yang lebih aman
-    const token = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('TOKEN_AUTH='))
-      ?.split('=')[1];
+    // Cara paling tangguh dan aman membaca cookie menggunakan Regex
+    const match = document.cookie.match(new RegExp('(^| )TOKEN_AUTH=([^;]+)'));
+    const token = match ? decodeURIComponent(match[2]) : null;
     
+    // Pelacak untuk mengecek apakah token berhasil dibaca oleh Axios di console browser
+    console.log("Status Token di Axios:", token ? "TERBACA" : "KOSONG");
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    
     return config;
   },
   (error) => {

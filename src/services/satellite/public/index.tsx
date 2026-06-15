@@ -6,7 +6,7 @@ const SatellitePublic = axios.create({
   timeout: 30000,
   headers: {
     "Content-Type": "application/json",
-    "X-API-KEY": 'base64:ATExanwKx0EoEeEsVSFlOhELX/PoEuPKqWkBu3yTEUo=', 
+    "X-API-KEY": '881182541952993820593968', 
   },
 });
 

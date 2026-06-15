@@ -13,13 +13,20 @@ const api = axios.create({
 // Interceptor: Menambahkan token secara otomatis ke setiap request
 api.interceptors.request.use(
   (config) => {
-    // Cara paling tangguh dan aman membaca cookie menggunakan Regex
-    const match = document.cookie.match(new RegExp('(^| )TOKEN_AUTH=([^;]+)'));
-    const token = match ? decodeURIComponent(match[2]) : null;
-    
-    // Pelacak untuk mengecek apakah token berhasil dibaca oleh Axios di console browser
-    console.log("Status Token di Axios:", token ? "TERBACA" : "KOSONG");
+    let token = null;
 
+    // Pengecekan krusial: Pastikan ini berjalan di browser, bukan di server Next.js
+    if (typeof window !== 'undefined') {
+      // Cara paling tangguh dan aman membaca cookie menggunakan Regex
+      const match = document.cookie.match(new RegExp('(^| )TOKEN_AUTH=([^;]+)'));
+      token = match ? decodeURIComponent(match[2]) : null;
+      
+      // Pelacak untuk mengecek apakah token berhasil dibaca oleh Axios di console browser
+      // (Bisa dihapus jika aplikasi sudah mau masuk tahap produksi)
+      console.log("Status Token di Axios:", token ? "TERBACA" : "KOSONG");
+    }
+
+    // Jika token ada, sisipkan ke header Authorization
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

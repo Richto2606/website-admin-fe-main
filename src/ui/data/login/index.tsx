@@ -292,7 +292,7 @@ export function LoginForm() {
           router.replace('/dashboard');
           router.refresh();
         } else {
-          window.location.href = `http://localhost:5173/?token=${token}`; 
+          window.location.href = `https://website-public-main.vercel.app/?token=${token}`; 
         }
       }
     } catch (error: any) {

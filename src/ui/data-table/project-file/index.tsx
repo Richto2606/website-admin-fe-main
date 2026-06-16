@@ -16,7 +16,11 @@ const ProjectFile = ({ name, file }: { name: string; file: string | null }) => {
     .map((n) => n[0])
     .join(" ")
     .toUpperCase();
-    const url = `${process.env.NEXT_BASE_URL}${file}`;
+    
+  // --- INI BAGIAN YANG DIUBAH ---
+  // Kita langsung tembak ke domain backend Anda karena 'file' sudah berisi '/storage/namafoto.png'
+  const url = file ? `https://asramaputrakukar.my.id${file}` : ""; 
+  // ------------------------------
 
   const shortenedName = formatShortName(name, 5, '.');
   return (

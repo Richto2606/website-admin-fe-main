@@ -3,44 +3,47 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    --background: #e6e6e6;
-    --foreground: #334155;
+ :root {
+    /* 1. Latar Belakang Utama (Kuning Khas Bumble) */
+    --background: #FFC629;            /* Warna Kuning Ikonik Bumble */
+    --foreground: #1E293B;            /* Teks Utama Hitam/Slate Gelap agar sangat kontras dan tajam */
 
-    --card: #ffffff;
-    --card-foreground: #020817;
+    --card: #ffffff;                  /* Putih Bersih untuk kontras komponen */
+    --card-foreground: #1E293B;
 
     --popover: #ffffff;
-    --popover-foreground: #020817;
+    --popover-foreground: #1E293B;
 
-    --primary: #ffffff;
-    --primary-foreground: #f8fafc;
+    /* 2. Tombol Utama & Otoritas (Kontras Tinggi ala Bumble) */
+    --primary: #1E293B;               /* Tombol utama menggunakan Hitam Gelap */
+    --primary-foreground: #ffffff;    /* Teks di dalam tombol utama menjadi putih */
 
-    --secondary: #f1f5f9;
-    --secondary-foreground: #0f172a;
+    --secondary: #ffffff;             /* Tombol kedua menggunakan Putih */
+    --secondary-foreground: #1E293B;  /* Teks tombol kedua menggunakan Hitam */
 
     --muted: #f1f5f9;
     --muted-foreground: #64748b;
 
-    --accent: #f1f5f9;
-    --accent-foreground: #0f172a;
+    --accent: #FFC629;
+    --accent-foreground: #1E293B;
 
     --destructive: #ef4444;
-    --destructive-foreground: #f8fafc;
+    --destructive-foreground: #ffffff;
 
-    --border: #e2e8f0;
-    --input: #e2e8f0;
-    --ring: #020817;
+    --border: #cbd5e1;
+    --input: #cbd5e1;
+    --ring: #1E293B;
 
-    --gold: #ccbb22;
-    --yellow: #ffe92b;
-    --honey: #fff280;
-    --blonde: #fffbd5;
-    --green: #4caf50;
-    --red: #df6466;
-    --red-foreground: #df6466;
+    /* 3. Penyesuaian Variabel Pendukung */
+    --gold: #1E293B;                  /* Bingkai segi enam diubah ke Hitam Tebal agar modern */
+    --yellow: #FFC629;
+    --honey: #fde047;
+    --blonde: #fef08a;
+    --green: #22c55e;
+    --red: #ef4444;
+    --red-foreground: #ef4444;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;                /* Sudut sedikit lebih melengkung agar ramah ala aplikasi modern */
   }
 
   .dark {

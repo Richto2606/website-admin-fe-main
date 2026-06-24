@@ -15,7 +15,6 @@ export async function login(
   state: FormState,
   formData: FormData,
 ): Promise<FormState> {
-
   try {
     const validatedFields = LoginFormSchema.safeParse({
       email: formData.get('email'),
@@ -62,10 +61,11 @@ export async function login(
     if (jwtToken) {
       const cookiesObj = await cookies(); 
       const cookieOptions = {
-        httpOnly: false, // <-- UBAH KE FALSE AGAR AXIOS BISA MEMBACA TOKEN
+        httpOnly: false,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax' as const,
         path: '/',
+        maxAge: 60 * 60 * 24 * 7, // 7 hari
       };
 
       cookiesObj.set('TOKEN_AUTH', jwtToken, cookieOptions);
@@ -114,7 +114,6 @@ export async function register(
   state: FormState,
   formData: FormData,
 ): Promise<FormState> {
-
   try {
     const name = formData.get('name');
     const email = formData.get('email');
@@ -215,10 +214,11 @@ export async function refreshAccessToken(token: string): Promise<string | undefi
     if (newToken) {
       const cookiesObj = await cookies(); 
       cookiesObj.set('TOKEN_AUTH', newToken, {
-        httpOnly: false, // <-- UBAH KE FALSE AGAR AXIOS BISA MEMBACA TOKEN
+        httpOnly: false,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
         path: '/',
+        maxAge: 60 * 60 * 24 * 7,
       });
       return newToken;
     }
@@ -246,24 +246,43 @@ function isUserRegister(data: unknown): data is UserRegister {
   );
 }
 
-function isRefreshToken(data: unknown): data is UserLogin {
-  return (
-    typeof data === 'object' &&
-    data !== null &&
-    'access_token' in data
-  );
-}
-
+// 🔥 FUNGSI LOGOUT YANG DIPERBAIKI
 export async function logout() {
-  const res = await SatellitePrivate.post<formatMessage>('/logout');
-  return res.data;
+  try {
+    // 1. Panggil API logout
+    const res = await SatellitePrivate.post<formatMessage>('/logout');
+    
+    // 2. Hapus semua cookies
+    await deleteCookies();
+    
+    return res.data;
+    
+  } catch (error) {
+    console.error('Logout error:', error);
+    
+    // Tetap hapus cookies meskipun API gagal
+    await deleteCookies();
+    
+    throw error;
+  }
 }
 
-export async function deleteCookies(){
+// 🔥 FUNGSI DELETE COOKIES
+export async function deleteCookies() {
   const cookiesObj = await cookies(); 
-  // Hapus seluruh cookie terkait login dengan memberikan maxAge: -1
+  
+  // Hapus semua cookie dengan maxAge: -1
   cookiesObj.set('TOKEN_AUTH', '', { maxAge: -1, path: '/' });
   cookiesObj.set('USER_ROLE', '', { maxAge: -1, path: '/' });
   cookiesObj.set('USER_NAME', '', { maxAge: -1, path: '/' });
   cookiesObj.set('USER_EMAIL', '', { maxAge: -1, path: '/' });
+}
+
+// 🔥 FUNGSI LOGOUT DARI CLIENT (tambahkan)
+export async function clientLogout() {
+  // Hapus cookies di server
+  await deleteCookies();
+  
+  // Return success
+  return { success: true };
 }

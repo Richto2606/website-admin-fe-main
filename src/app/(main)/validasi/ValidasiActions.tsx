@@ -22,31 +22,46 @@ export default function ValidasiActions({ row }: { row: any }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleUpdateStatus = async (status: string) => {
-    try {
-      const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://asramaputrakukar.my.id/api/v1';
-      const res = await fetch(`${BASE_URL}/pendaftaran/${pendaftar.id_pendaftaran}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Authorization': `Bearer ${token}`, 
-          'x-api-key': process.env.NEXT_PUBLIC_API_KEY || '881182541952993820593968'
-        },
-        body: JSON.stringify({ status_pendaftaran: status }),
-      });
+const handleUpdateStatus = async (status: string) => {
+  // Tambahkan pengecekan token sebelum fetch
+  if (!token) {
+    alert("Token tidak ditemukan, silakan login kembali.");
+    localStorage.removeItem('token');
+    router.push('/login');
+    return;
+  }
 
-      if (res.ok) {
-        alert(`Status berhasil diubah menjadi ${status}`);
-        setIsOpen(false);
-        router.refresh(); 
-      } else {
-        alert('Gagal mengubah status');
-      }
-    } catch (error) {
-      console.error('Error:', error);
+  try {
+    const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://asramaputrakukar.my.id/api/v1';
+    
+    // Debugging: cek di console apa yang dikirim
+    console.log(`Mengupdate ${pendaftar.id_pendaftaran} ke status: ${status}`);
+
+    const res = await fetch(`${BASE_URL}/pendaftaran/${pendaftar.id_pendaftaran}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`, 
+        'x-api-key': '881182541952993820593968'
+      },
+      body: JSON.stringify({ status_pendaftaran: status }),
+    });
+
+    if (res.ok) {
+      alert(`Status berhasil diubah menjadi ${status}`);
+      setIsOpen(false);
+      router.refresh(); 
+    } else {
+      // Jika status bukan 200, log error dari server
+      const errorText = await res.text();
+      console.error('Server error response:', errorText);
+      alert('Gagal mengubah status. Periksa console untuk detail.');
     }
-  };
+  } catch (error) {
+    console.error('Koneksi error:', error);
+    alert('Terjadi kesalahan jaringan.');
+  }
+};
 
   return (
     <div className="relative" ref={dropdownRef}>

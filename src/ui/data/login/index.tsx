@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Button } from '@components/button';
@@ -75,7 +74,7 @@ export function LoginForm() {
            return;
         }
 
-        // Set Cookie
+        // Set Cookie untuk admin FE
         document.cookie = `TOKEN_AUTH=${token}; path=/; max-age=86400; SameSite=Lax`;
         document.cookie = `USER_NAME=${user.name}; path=/; max-age=86400; SameSite=Lax`;
         document.cookie = `USER_EMAIL=${user.email}; path=/; max-age=86400; SameSite=Lax`;
@@ -85,7 +84,12 @@ export function LoginForm() {
           router.replace('/dashboard');
           router.refresh();
         } else {
-          window.location.href = `https://website-public-main.vercel.app/?token=${token}`; 
+          // 🔥 SIMPAN TOKEN DI LOCALSTORAGE DULU
+          localStorage.setItem('token', token);
+          localStorage.setItem('user', JSON.stringify(user));
+          
+          // 🔥 REDIRECT TANPA TOKEN DI URL
+          window.location.href = 'https://website-public-main.vercel.app/';
         }
       }
     } catch (error: any) {

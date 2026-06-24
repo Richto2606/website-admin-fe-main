@@ -84,7 +84,10 @@
 //           router.replace('/dashboard');
 //           router.refresh();
 //         } else {
-//           window.location.href = `http://localhost:5173/?token=${token}`; 
+//           // 🔥 PERBAIKI INI - Ganti localhost dengan domain
+//           window.location.href = `https://asramaputrakukar.my.id/?token=${token}`; 
+//           // Atau jika pakai Vercel:
+//           // window.location.href = `https://website-public-main.vercel.app/?token=${token}`;
 //         }
 //       }
 //     } catch (error: any) {

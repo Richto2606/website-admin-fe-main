@@ -81,7 +81,6 @@ export function LoginForm() {
         console.log('🔍 Token:', token);
         console.log('🔍 User:', user);
         console.log('🔍 User Role:', userRole);
-        console.log('🔍 localStorage BEFORE save:', localStorage);
         console.log('🔍 =========================');
 
         // Set Cookie untuk admin FE
@@ -91,29 +90,25 @@ export function LoginForm() {
         document.cookie = `USER_ROLE=${userRole}; path=/; max-age=86400; SameSite=Lax`;
 
         // ============================================================
-        // 🔥 SIMPAN KE LOCALSTORAGE
+        // 🔥 SIMPAN KE LOCALSTORAGE (untuk berjaga-jaga)
         // ============================================================
         localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify(user));
 
-        // ============================================================
-        // 🔥 DEBUG: CEK SETELAH DISIMPAN
-        // ============================================================
-        console.log('🔍 localStorage AFTER save:', localStorage);
         console.log('🔍 Token from localStorage:', localStorage.getItem('token'));
-        console.log('🔍 User from localStorage:', localStorage.getItem('user'));
-        console.log('🔍 ===== END DEBUG =====');
 
+        // ============================================================
+        // 🔥 REDIRECT DENGAN TOKEN DI URL (SOLUSI SEMENTARA)
+        // ============================================================
         if (userRole === 'Admin' || userRole === 'admin') {
           console.log('🔍 Redirecting to Dashboard (Admin)');
           router.replace('/dashboard');
           router.refresh();
         } else {
-          console.log('🔍 Redirecting to Public Main (User)');
-          console.log('🔍 Redirect URL: https://website-public-main.vercel.app/');
+          console.log('🔍 Redirecting to Public Main with token in URL');
           
-          // 🔥 REDIRECT TANPA TOKEN DI URL
-          window.location.href = 'https://website-public-main.vercel.app/';
+          // 🔥 KIRIM TOKEN VIA URL
+          window.location.href = `https://website-public-main.vercel.app/pendaftaran?token=${token}`;
         }
       }
     } catch (error: any) {

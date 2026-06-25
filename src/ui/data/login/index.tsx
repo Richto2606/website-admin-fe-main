@@ -74,19 +74,43 @@ export function LoginForm() {
            return;
         }
 
+        // ============================================================
+        // 🔥 DEBUG: CEK DATA SEBELUM DISIMPAN
+        // ============================================================
+        console.log('🔍 ===== LOGIN DEBUG =====');
+        console.log('🔍 Token:', token);
+        console.log('🔍 User:', user);
+        console.log('🔍 User Role:', userRole);
+        console.log('🔍 localStorage BEFORE save:', localStorage);
+        console.log('🔍 =========================');
+
         // Set Cookie untuk admin FE
         document.cookie = `TOKEN_AUTH=${token}; path=/; max-age=86400; SameSite=Lax`;
         document.cookie = `USER_NAME=${user.name}; path=/; max-age=86400; SameSite=Lax`;
         document.cookie = `USER_EMAIL=${user.email}; path=/; max-age=86400; SameSite=Lax`;
         document.cookie = `USER_ROLE=${userRole}; path=/; max-age=86400; SameSite=Lax`;
 
+        // ============================================================
+        // 🔥 SIMPAN KE LOCALSTORAGE
+        // ============================================================
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(user));
+
+        // ============================================================
+        // 🔥 DEBUG: CEK SETELAH DISIMPAN
+        // ============================================================
+        console.log('🔍 localStorage AFTER save:', localStorage);
+        console.log('🔍 Token from localStorage:', localStorage.getItem('token'));
+        console.log('🔍 User from localStorage:', localStorage.getItem('user'));
+        console.log('🔍 ===== END DEBUG =====');
+
         if (userRole === 'Admin' || userRole === 'admin') {
+          console.log('🔍 Redirecting to Dashboard (Admin)');
           router.replace('/dashboard');
           router.refresh();
         } else {
-          // 🔥 SIMPAN TOKEN DI LOCALSTORAGE DULU
-          localStorage.setItem('token', token);
-          localStorage.setItem('user', JSON.stringify(user));
+          console.log('🔍 Redirecting to Public Main (User)');
+          console.log('🔍 Redirect URL: https://website-public-main.vercel.app/');
           
           // 🔥 REDIRECT TANPA TOKEN DI URL
           window.location.href = 'https://website-public-main.vercel.app/';

@@ -49,7 +49,6 @@ export function LoginForm() {
     setErrorMessage('');
     
     try {
-      // Menembak langsung ke API menggunakan SatellitePublic
       const res = await SatellitePublic.post('/auth/login', {
         email: values.email,
         password: values.password,
@@ -74,14 +73,10 @@ export function LoginForm() {
            return;
         }
 
-        // ============================================================
-        // 🔥 DEBUG: CEK DATA SEBELUM DISIMPAN
-        // ============================================================
         console.log('🔍 ===== LOGIN DEBUG =====');
         console.log('🔍 Token:', token);
         console.log('🔍 User:', user);
         console.log('🔍 User Role:', userRole);
-        console.log('🔍 =========================');
 
         // Set Cookie untuk admin FE
         document.cookie = `TOKEN_AUTH=${token}; path=/; max-age=86400; SameSite=Lax`;
@@ -89,26 +84,21 @@ export function LoginForm() {
         document.cookie = `USER_EMAIL=${user.email}; path=/; max-age=86400; SameSite=Lax`;
         document.cookie = `USER_ROLE=${userRole}; path=/; max-age=86400; SameSite=Lax`;
 
-        // ============================================================
-        // 🔥 SIMPAN KE LOCALSTORAGE (untuk berjaga-jaga)
-        // ============================================================
+        // Simpan ke localStorage (untuk berjaga-jaga)
         localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify(user));
 
         console.log('🔍 Token from localStorage:', localStorage.getItem('token'));
 
-        // ============================================================
-        // 🔥 REDIRECT DENGAN TOKEN DI URL (SOLUSI SEMENTARA)
-        // ============================================================
         if (userRole === 'Admin' || userRole === 'admin') {
           console.log('🔍 Redirecting to Dashboard (Admin)');
           router.replace('/dashboard');
           router.refresh();
         } else {
-          console.log('🔍 Redirecting to Public Main with token in URL');
+          console.log('🔍 Redirecting to Public Main (Beranda)');
           
-          // 🔥 KIRIM TOKEN VIA URL
-          window.location.href = `https://website-public-main.vercel.app/pendaftaran?token=${token}`;
+          // 🔥 REDIRECT KE BERANDA DENGAN TOKEN DI URL
+          window.location.href = `https://website-public-main.vercel.app/?token=${token}`;
         }
       }
     } catch (error: any) {

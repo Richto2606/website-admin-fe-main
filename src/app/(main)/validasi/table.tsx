@@ -14,6 +14,11 @@ interface Pendaftaran {
   no_hp: string;
   email: string;
   alamat_asal: string;
+  nama_wali?: string;
+  semester?: number;
+  no_ortu_wali?: string;
+  nama_ortu_wali?: string;
+  file_berkas?: string;
   status_pendaftaran: string;
   created_at: string;
 }
@@ -22,6 +27,7 @@ export default function ValidasiTable() {
   const [data, setData] = useState<Pendaftaran[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [filterStatus, setFilterStatus] = useState('semua');
 
   // 🔥 FETCH DATA DARI API
   useEffect(() => {
@@ -134,6 +140,40 @@ export default function ValidasiTable() {
     }
   };
 
+  // 🔥 FUNGSI LIHAT DETAIL
+  const viewDetail = (item: Pendaftaran) => {
+    Swal.fire({
+      title: 'Detail Pendaftaran',
+      html: `
+        <div style="text-align:left; font-size:14px;">
+          <p><strong>Nama:</strong> ${item.nama_lengkap}</p>
+          <p><strong>NIM:</strong> ${item.nim}</p>
+          <p><strong>Universitas:</strong> ${item.universitas}</p>
+          <p><strong>Program Studi:</strong> ${item.program_studi}</p>
+          <p><strong>Jenis Kelamin:</strong> ${item.jenis_kelamin}</p>
+          <p><strong>No HP:</strong> ${item.no_hp}</p>
+          <p><strong>Email:</strong> ${item.email || '-'}</p>
+          <p><strong>Alamat Asal:</strong> ${item.alamat_asal}</p>
+          <p><strong>Nama Wali:</strong> ${item.nama_wali || '-'}</p>
+          <p><strong>Semester:</strong> ${item.semester || '-'}</p>
+          <p><strong>No Orang Tua/Wali:</strong> ${item.no_ortu_wali || '-'}</p>
+          <p><strong>Nama Orang Tua/Wali:</strong> ${item.nama_ortu_wali || '-'}</p>
+          <p><strong>File Berkas:</strong> ${item.file_berkas ? 
+            `<a href="https://asramaputrakukar.my.id/${item.file_berkas}" target="_blank" style="color:blue;">Lihat Berkas</a>` 
+            : '-'}</p>
+        </div>
+      `,
+      icon: 'info',
+      confirmButtonColor: '#1F3877',
+      confirmButtonText: 'Tutup'
+    });
+  };
+
+  // 🔥 FILTER DATA
+  const filteredData = filterStatus === 'semua' 
+    ? data 
+    : data.filter(item => item.status_pendaftaran === filterStatus);
+
   // 🔥 RENDER LOADING
   if (loading) {
     return (
@@ -165,14 +205,26 @@ export default function ValidasiTable() {
   // 🔥 RENDER TABLE
   return (
     <div className="p-4">
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex flex-wrap justify-between items-center mb-4 gap-2">
         <h2 className="text-xl font-bold">Data Pendaftaran</h2>
-        <span className="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">
-          Total: {data.length} Pendaftar
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">
+            Total: {data.length} Pendaftar
+          </span>
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="px-3 py-1 border border-gray-300 rounded text-sm"
+          >
+            <option value="semua">Semua Status</option>
+            <option value="Menunggu">Menunggu</option>
+            <option value="Diterima">Diterima</option>
+            <option value="Ditolak">Ditolak</option>
+          </select>
+        </div>
       </div>
 
-      {data.length === 0 ? (
+      {filteredData.length === 0 ? (
         <div className="text-center py-12 text-gray-400">
           <p className="text-lg">Belum ada data pendaftaran.</p>
         </div>
@@ -193,7 +245,7 @@ export default function ValidasiTable() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {data.map((item, index) => (
+              {filteredData.map((item, index) => (
                 <tr key={item.id_pendaftaran} className="hover:bg-gray-50 transition-colors duration-200">
                   <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{index + 1}</td>
                   <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">{item.nama_lengkap || '-'}</td>
@@ -219,7 +271,13 @@ export default function ValidasiTable() {
                     </span>
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap text-sm">
-                    <div className="flex gap-1">
+                    <div className="flex gap-1 flex-wrap">
+                      <button
+                        onClick={() => viewDetail(item)}
+                        className="px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600"
+                      >
+                        Detail
+                      </button>
                       {item.status_pendaftaran !== 'Diterima' && (
                         <button
                           onClick={() => updateStatus(item.id_pendaftaran, 'Diterima')}

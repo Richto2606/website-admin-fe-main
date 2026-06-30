@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { Button } from '@components/button';
 import CustomText from '@components/particel/custom-text';
 import DynamicCard from '@components/particel/dynamic-card';
@@ -11,6 +11,11 @@ import Link from 'next/link';
 import { GalleryAddForm } from '@interfaces/data-types';
 import { useRouter } from 'next/navigation';
 import { useQueryClient } from '../hook';
+import axios from 'axios';
+
+// 🔥 TARUH LANGSUNG DI SINI (tanpa import dari constant)
+const urlAPIBE = "https://api.asramaputrakukar.my.id";
+const APIKEY = "881182541952993820593968";
 
 export default function AddGalleriesPage() {
   const router = useRouter();
@@ -24,6 +29,22 @@ export default function AddGalleriesPage() {
   });
   
   const { isLoading, createGallery } = useQueryClient();
+  const [categories, setCategories] = useState([]);
+
+  // 🔥 FETCH KATEGORI
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get(`${urlAPIBE}/api/v1/public/categories`, {
+          headers: { "X-API-KEY": APIKEY }
+        });
+        setCategories(response.data.data || []);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   const handleFormSubmit = (data: GalleryAddForm) => {
     formDataRef.current = data;

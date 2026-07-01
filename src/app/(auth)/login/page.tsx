@@ -13,14 +13,27 @@ import { RegisterForm } from "@ui/data/register";
 
 export default function LoginPage() {
   return (
-    <div className='h-full md:max-h-md lg:max-h-lg xl:max-h-4xl mt-2 overflow-auto flex items-center justify-center relative'>
+    // 🔥 UBAH: Background menjadi PUTIH
+    <div className='h-full md:max-h-md lg:max-h-lg xl:max-h-4xl mt-2 overflow-auto flex items-center justify-center relative bg-white'>
       <div className='absolute bottom-5 right-0'>
         <ThemeToggler />
       </div>
       <Tabs defaultValue='login' className='w-[500px]'>
-        <TabsList className='grid w-full grid-cols-2'>
-          <TabsTrigger value='login'>Login</TabsTrigger>
-          <TabsTrigger value='register'>Register</TabsTrigger>
+        {/* 🔥 UBAH: Tab background menjadi KUNING MUDA */}
+        <TabsList className='grid w-full grid-cols-2 bg-[#FCE124]/20'>
+          {/* 🔥 UBAH: Tab aktif menjadi KUNING dengan teks HITAM */}
+          <TabsTrigger 
+            value='login' 
+            className="data-[state=active]:bg-[#FCE124] data-[state=active]:text-black text-black"
+          >
+            Login
+          </TabsTrigger>
+          <TabsTrigger 
+            value='register' 
+            className="data-[state=active]:bg-[#FCE124] data-[state=active]:text-black text-black"
+          >
+            Register
+          </TabsTrigger>
         </TabsList>
         <TabsContent value='login'>
           <LoginForm />

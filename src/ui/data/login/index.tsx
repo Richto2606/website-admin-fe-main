@@ -25,8 +25,6 @@ import { LoginFormSchema } from '@services/auth/definitions';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Eye, EyeOff, LogIn } from 'lucide-react';
-
-// Menggunakan instance Axios Anda secara langsung
 import SatellitePublic from '@services/satellite/public'; 
 
 export function LoginForm() {
@@ -78,13 +76,11 @@ export function LoginForm() {
         console.log('🔍 User:', user);
         console.log('🔍 User Role:', userRole);
 
-        // Set Cookie untuk admin FE
         document.cookie = `TOKEN_AUTH=${token}; path=/; max-age=86400; SameSite=Lax`;
         document.cookie = `USER_NAME=${user.name}; path=/; max-age=86400; SameSite=Lax`;
         document.cookie = `USER_EMAIL=${user.email}; path=/; max-age=86400; SameSite=Lax`;
         document.cookie = `USER_ROLE=${userRole}; path=/; max-age=86400; SameSite=Lax`;
 
-        // Simpan ke localStorage (untuk berjaga-jaga)
         localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify(user));
 
@@ -96,8 +92,6 @@ export function LoginForm() {
           router.refresh();
         } else {
           console.log('🔍 Redirecting to Public Main (Beranda)');
-          
-          // 🔥 REDIRECT KE BERANDA DENGAN TOKEN DI URL
           window.location.href = `https://website-public-main.vercel.app/?token=${token}`;
         }
       }
@@ -121,10 +115,11 @@ export function LoginForm() {
   };
 
   return (
-    <Card>
+    // 🔥 UBAH: Card menjadi PUTIH dengan border
+    <Card className="bg-white border border-gray-200 shadow-lg">
       <CardHeader>
-        <CardTitle>Login</CardTitle>
-        <CardDescription>
+        <CardTitle className="text-black text-2xl font-bold">Login</CardTitle>
+        <CardDescription className="text-gray-600">
           Welcome to Login Page Asrama Kutai Kartanegara Silahkan login
         </CardDescription>
       </CardHeader>
@@ -143,10 +138,12 @@ export function LoginForm() {
               name='email'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className='uppercase text-xs font-bold text-zinc-500 dark:text-white'>Email</FormLabel>
+                  {/* 🔥 UBAH: Label menjadi HITAM */}
+                  <FormLabel className='uppercase text-xs font-bold text-black'>Email</FormLabel>
                   <FormControl>
+                    {/* 🔥 UBAH: Input PUTIH dengan border abu-abu */}
                     <Input
-                      className='bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white focus-visible: ring-offset-0'
+                      className='bg-white border border-gray-300 focus-visible:ring-[#FCE124] text-black placeholder-gray-400 focus-visible:ring-2'
                       placeholder='Enter Email'
                       {...field}
                     />
@@ -161,12 +158,14 @@ export function LoginForm() {
               name='password'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className='uppercase text-xs font-bold text-zinc-500 dark:text-white'>Password</FormLabel>
+                  {/* 🔥 UBAH: Label menjadi HITAM */}
+                  <FormLabel className='uppercase text-xs font-bold text-black'>Password</FormLabel>
                   <FormControl>
                     <div className='relative'>
+                      {/* 🔥 UBAH: Input PUTIH dengan border abu-abu */}
                       <Input
                         type={showPassword ? 'text' : 'password'}
-                        className='bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white focus-visible: ring-offset-0'
+                        className='bg-white border border-gray-300 focus-visible:ring-[#FCE124] text-black placeholder-gray-400 focus-visible:ring-2'
                         placeholder='Enter Password'
                         {...field}
                       />
@@ -177,7 +176,7 @@ export function LoginForm() {
                         className="absolute top-1/2 right-3 transform -translate-y-1/2"
                         onClick={() => setShowPassword((prev) => !prev)}
                       >
-                        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                        {showPassword ? <EyeOff size={20} className="text-black" /> : <Eye size={20} className="text-black" />}
                       </Button>
                     </div>
                   </FormControl>
@@ -186,15 +185,16 @@ export function LoginForm() {
               )}
             />
 
+            {/* 🔥 UBAH: Tombol menjadi KUNING dengan teks HITAM */}
             <Button
               disabled={isSubmitting}
               type="submit"
               variant='outline'
               size={null as any}
-              className='mt-4 w-full bg-slate-100 hover:bg-gold hover:text-blonde dark:bg-slate-500 dark:text-white dark:hover:text-white border-0 p-2'
+              className='mt-4 w-full bg-[#FCE124] hover:bg-[#FFD700] text-black border-0 p-2 font-bold transition-all duration-300'
             >
-              <LogIn className='h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all' />
-              <span className='ml-1 '>{isSubmitting ? 'Submitting...' : 'Login'}</span>
+              <LogIn className='h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all text-black' />
+              <span className='ml-1 text-black'>{isSubmitting ? 'Submitting...' : 'Login'}</span>
             </Button>
           </form>
         </Form>

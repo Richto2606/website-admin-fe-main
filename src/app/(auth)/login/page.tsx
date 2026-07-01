@@ -13,13 +13,12 @@ import { RegisterForm } from "@ui/data/register";
 
 export default function LoginPage() {
   return (
-    // 🔥 UBAH: Background menjadi PUTIH (bg-white)
+    // 🔥 TAMBAHKAN bg-white
     <div className='h-full md:max-h-md lg:max-h-lg xl:max-h-4xl mt-2 overflow-auto flex items-center justify-center relative bg-white'>
       <div className='absolute bottom-5 right-0'>
         <ThemeToggler />
       </div>
       <Tabs defaultValue='login' className='w-[500px]'>
-        {/* 🔥 UBAH: Tab background menjadi KUNING MUDA */}
         <TabsList className='grid w-full grid-cols-2 bg-[#FCE124]/20'>
           <TabsTrigger 
             value='login' 

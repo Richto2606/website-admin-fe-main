@@ -4,8 +4,8 @@
 
 @layer base {
   :root {
-    --background: #e6e6e6;
-    --foreground: #334155;
+    --background: #ffffff;
+    --foreground: #000000;
 
     --card: #ffffff;
     --card-foreground: #020817;

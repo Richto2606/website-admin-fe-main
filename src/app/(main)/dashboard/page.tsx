@@ -63,19 +63,18 @@ export default function DashboardPage() {
           sinkronisasiPayment(undefined, controller.signal)
         ]);
 
-        // Jika salah satu request mengembalikan null karena 401 atau dibatalkan, jangan lanjutkan set state
         if (controller.signal.aborted) return;
 
         if (resResidents) {
           setPenghuni([
             { name: "Total", count: resResidents.data_count, fill: "white" },
-            { name: "Penghuni", count: resResidents.data_active, fill: "#2280CC" }
+            { name: "Penghuni", count: resResidents.data_active, fill: "#FCE124" }
           ]);
         }
         if (resKamar) {
           setKamar([
             { name: "Total", count: resKamar.data_count, fill: "white" },
-            { name: "Kamar", count: resKamar.data_active, fill: "#2280CC" }
+            { name: "Kamar", count: resKamar.data_active, fill: "#FCE124" }
           ]);
         }
         if (resPemasukan) {
@@ -165,8 +164,10 @@ export default function DashboardPage() {
     setMonthPengeluaran(parseInt(value, 10));
   };
   const breadcrumbs = createTitleAndBreadcrumbs(dashboardString, dashboardUrl);
+  
   return (
-    <div className='container max-w-screen-xl mx-auto px-4'>
+    // 🔥 UBAH: Background menjadi PUTIH
+    <div className='container max-w-screen-xl mx-auto px-4 bg-white min-h-screen'>
       <Breadcumbs title={breadcrumbs.mainTitle} breadCrumbs={breadcrumbs.breadCrumbsMain} />
       <div className="flex flex-col space-y-4 mt-2">
         <div className="grid grid-cols-4 gap-4">
@@ -176,7 +177,7 @@ export default function DashboardPage() {
             isBar={true}
             value={penghuni[1]?.count || 0} 
             total={penghuni[0]?.count || 0} 
-            colorMain="#2280CC"
+            colorMain="#FCE124"
             detailLink="/residents"
           />
           <DashboardCard 
@@ -185,7 +186,7 @@ export default function DashboardPage() {
             isBar={true}
             value={kamar[1]?.count || 0} 
             total={kamar[0]?.count || 0} 
-            colorMain="#E66969"
+            colorMain="#FCE124"
             detailLink="#" 
           />
           <DashboardCard 
@@ -194,7 +195,7 @@ export default function DashboardPage() {
             isBar={false}
             value={formatCurrency(pendapatan.toString() || '')} 
             total="" 
-            colorMain="#1DBB6C"
+            colorMain="#FCE124"
             detailLink="/reports"
           />
           <DashboardCard 
@@ -203,25 +204,25 @@ export default function DashboardPage() {
             isBar={false}
             value={sinkronisasi} 
             total="Total Laporan Pembayaran" 
-            colorMain="#E6AA06"
+            colorMain="#FCE124"
             detailLink="/payments" 
           />
         </div>
         <div className="grid grid-cols-2 gap-4">
           <DynamicCard 
             header={
-              <div className='flex p-4 justify-between'>
+              <div className='flex p-4 justify-between bg-white border-b border-gray-200'>
                 <div className="w-[50%]">
-                  <span>Total Pemasukan Bulanan</span>
+                  <span className="font-semibold text-black">Total Pemasukan Bulanan</span>
                 </div>
                 <div className="w-[50%]">
                   <Select value={monthPemasukan.toString()} onValueChange={handleMonthPemasukanChange}>
-                    <SelectTrigger aria-label={`pemasukan`} className=" bg-transparent">
+                    <SelectTrigger aria-label={`pemasukan`} className="bg-[#FCE124]/20 border border-[#FCE124] text-black">
                       <SelectValue placeholder={'Pilih bulan'} />
                     </SelectTrigger>
                     <SelectContent>
                       {bulan.map((item, index) => (
-                        <SelectItem value={item.value.toString()} key={index}>
+                        <SelectItem value={item.value.toString()} key={index} className="text-black">
                           {item.text}
                         </SelectItem>
                       ))}
@@ -241,18 +242,18 @@ export default function DashboardPage() {
           
           <DynamicCard 
             header={
-              <div className='flex p-4 justify-between'>
+              <div className='flex p-4 justify-between bg-white border-b border-gray-200'>
                 <div className="w-[50%]">
-                  <span>Total Pengeluaran Bulanan</span>
+                  <span className="font-semibold text-black">Total Pengeluaran Bulanan</span>
                 </div>
                 <div className="w-[50%]">
                   <Select value={monthPengeluaran.toString()} onValueChange={handleMonthPengeluaranChange}>
-                  <SelectTrigger aria-label={`pemasukan`} className=" bg-transparent">
+                  <SelectTrigger aria-label={`pemasukan`} className="bg-[#FCE124]/20 border border-[#FCE124] text-black">
                     <SelectValue placeholder={'Pilih bulan'} />
                   </SelectTrigger>
                   <SelectContent>
                     {bulan.map((item, index) => (
-                      <SelectItem value={item.value.toString()} key={index}>
+                      <SelectItem value={item.value.toString()} key={index} className="text-black">
                         {item.text}
                       </SelectItem>
                     ))}

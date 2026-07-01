@@ -3,23 +3,22 @@ import Sidebar from "@ui/sidebar";
 
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    // Wrapper utama mengunci tinggi pas 1 layar (h-screen) dan dibuat flex-col
-    <div className="h-screen flex flex-col overflow-hidden">
+    // 🔥 UBAH: Background utama menjadi PUTIH (bg-white)
+    <div className="h-screen flex flex-col overflow-hidden bg-white">
       <Navbar />
-      <hr className="h-[2px] bg-gray-200 border-none" />
+      <hr className="h-[2px] border-none" style={{ backgroundColor: '#FCE124' }} />
 
-      {/* Kontainer Bawah (Sidebar + Content) akan mengisi sisa tinggi layar */}
+      {/* Kontainer Bawah (Sidebar + Content) */}
       <div className="flex-1 flex overflow-hidden">
         
         {/* LEFT / SIDEBAR */}
-        {/* Menggunakan <aside> untuk semantik SEO/Aksesibilitas */}
-        <aside className="w-[20%] md:w-[11%] lg:w-[22%] xl:w-[20%] bg-primary overflow-y-auto">
+        <aside className="w-[20%] md:w-[11%] lg:w-[22%] xl:w-[20%] bg-[#FCE124] overflow-y-auto border-r border-black/10">
           <Sidebar />
         </aside>
 
         {/* RIGHT / MAIN CONTENT */}
-        {/* flex-1 otomatis mengambil seluruh sisa lebar tanpa perlu set width persen lagi */}
-        <main className="flex-1 p-5 overflow-y-auto">
+        {/* 🔥 UBAH: Background main content menjadi KUNING MUDA */}
+        <main className="flex-1 p-5 overflow-y-auto bg-[#FCE124]/5">
           {children}
         </main>
         

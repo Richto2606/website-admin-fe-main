@@ -100,7 +100,7 @@ export function RegisterForm() {
       <CardHeader>
         <CardTitle>Register</CardTitle>
         <CardDescription>
-          Welcome to Register Page Asrama Kutai Kartanegara - Admin
+          Welcome to Register Page Asrama Kutai Kartanegara Silahkan Register
         </CardDescription>
       </CardHeader>
       <CardContent className='space-y-2'>
@@ -115,7 +115,7 @@ export function RegisterForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className='uppercase text-xs font-bold text-zinc-500 dark:text-white'>
-                    Name
+                    Nama Lengkap
                   </FormLabel>
                   <FormControl>
                     <Input

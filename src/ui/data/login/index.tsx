@@ -125,7 +125,7 @@ export function LoginForm() {
       <CardHeader>
         <CardTitle>Login</CardTitle>
         <CardDescription>
-          Welcome to Login Page Asrama Kutai Kartanegara - Admin
+          Welcome to Login Page Asrama Kutai Kartanegara Silahkan login
         </CardDescription>
       </CardHeader>
       <CardContent className='space-y-2'>

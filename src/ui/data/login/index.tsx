@@ -115,8 +115,8 @@ export function LoginForm() {
   };
 
   return (
-    // 🔥 UBAH: Card menjadi PUTIH dengan border
-    <Card className="bg-white border border-gray-200 shadow-lg">
+    // 🔥 HAPUS SHADOW & BORDER
+    <Card className="bg-white shadow-none border-0">
       <CardHeader>
         <CardTitle className="text-black text-2xl font-bold">Login</CardTitle>
         <CardDescription className="text-gray-600">
@@ -138,10 +138,8 @@ export function LoginForm() {
               name='email'
               render={({ field }) => (
                 <FormItem>
-                  {/* 🔥 UBAH: Label menjadi HITAM */}
                   <FormLabel className='uppercase text-xs font-bold text-black'>Email</FormLabel>
                   <FormControl>
-                    {/* 🔥 UBAH: Input PUTIH dengan border abu-abu */}
                     <Input
                       className='bg-white border border-gray-300 focus-visible:ring-[#FCE124] text-black placeholder-gray-400 focus-visible:ring-2'
                       placeholder='Enter Email'
@@ -158,11 +156,9 @@ export function LoginForm() {
               name='password'
               render={({ field }) => (
                 <FormItem>
-                  {/* 🔥 UBAH: Label menjadi HITAM */}
                   <FormLabel className='uppercase text-xs font-bold text-black'>Password</FormLabel>
                   <FormControl>
                     <div className='relative'>
-                      {/* 🔥 UBAH: Input PUTIH dengan border abu-abu */}
                       <Input
                         type={showPassword ? 'text' : 'password'}
                         className='bg-white border border-gray-300 focus-visible:ring-[#FCE124] text-black placeholder-gray-400 focus-visible:ring-2'
@@ -185,7 +181,6 @@ export function LoginForm() {
               )}
             />
 
-            {/* 🔥 UBAH: Tombol menjadi KUNING dengan teks HITAM */}
             <Button
               disabled={isSubmitting}
               type="submit"

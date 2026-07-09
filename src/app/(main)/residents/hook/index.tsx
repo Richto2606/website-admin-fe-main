@@ -5,12 +5,234 @@ import {
   postResident,
   getByIdResident,
   putResident, 
+  // 🔥 HAPUS getResidents karena tidak ada
 } from '@services/resident';
 
 export function useQueryClient() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [residents, setResidents] = useState<Resident[]>([]);
 
+  // ==============================================
+  // 🔥 GET ALL RESIDENTS (LANGSUNG PAKAI FETCH)
+  // ==============================================
+  const getAllResidents = async (params?: {
+    name?: string;
+    page?: number;
+    limit?: number;
+    sort_by?: string;
+  }) => {
+    setIsLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const queryParams = new URLSearchParams();
+      if (params?.name) queryParams.append('name', params.name);
+      if (params?.page) queryParams.append('page', String(params.page));
+      if (params?.limit) queryParams.append('limit', String(params.limit));
+      if (params?.sort_by) queryParams.append('sort_by', params.sort_by);
+      
+      const url = `https://asramaputrakukar.my.id/api/v1/residents?${queryParams.toString()}`;
+      
+      const response = await fetch(url, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'x-api-key': '881182541952993820593968'
+        }
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        setResidents(result.data);
+        return {
+          success: true,
+          data: result.data,
+          pagination: {
+            count: result.count,
+            current_page: result.current_page,
+            total_pages: result.total_pages
+          }
+        };
+      } else {
+        toast({
+          variant: 'failed',
+          title: 'Error',
+          description: result.message || 'Gagal mengambil data penghuni',
+        });
+        return { success: false, data: [] };
+      }
+    } catch (err) {
+      console.error(err);
+      toast({
+        variant: 'failed',
+        title: 'Error',
+        description: 'Terjadi kesalahan saat mengambil data penghuni',
+      });
+      return { success: false, data: [] };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // ==============================================
+  // 🔥 GET RESIDENT BY USER ID
+  // ==============================================
+  const getResidentByUserId = async (userId: number) => {
+    setIsLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(
+        `https://asramaputrakukar.my.id/api/v1/residents/user/${userId}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'x-api-key': '881182541952993820593968'
+          }
+        }
+      );
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        return {
+          success: true,
+          data: result.data
+        };
+      } else {
+        return { success: false, data: null };
+      }
+    } catch (err) {
+      console.error(err);
+      return { success: false, data: null };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // ==============================================
+  // 🔥 CREATE RESIDENT FROM PENDAFTARAN
+  // ==============================================
+  const createResidentFromPendaftaran = async (formData: {
+    user_id: number;
+    name: string;
+    phone_number?: string;
+    address?: string;
+    status?: string;
+  }) => {
+    setIsLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(
+        'https://asramaputrakukar.my.id/api/v1/residents/from-pendaftaran',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            'x-api-key': '881182541952993820593968'
+          },
+          body: JSON.stringify({
+            user_id: formData.user_id,
+            name: formData.name,
+            phone_number: formData.phone_number || '',
+            address: formData.address || '',
+            status: formData.status || 'Aktif'
+          })
+        }
+      );
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        toast({
+          variant: 'success',
+          title: 'Success',
+          description: 'Data penghuni berhasil ditambahkan dari pendaftaran',
+        });
+        return { success: true, data: result.data };
+      } else {
+        toast({
+          variant: 'failed',
+          title: 'Error',
+          description: result.message || 'Gagal menambahkan penghuni',
+        });
+        return { success: false, data: null };
+      }
+    } catch (err) {
+      console.error(err);
+      toast({
+        variant: 'failed',
+        title: 'Error',
+        description: 'Terjadi kesalahan saat menambahkan penghuni',
+      });
+      return { success: false, data: null };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // ==============================================
+  // 🔥 UPDATE RESIDENT FROM PENDAFTARAN
+  // ==============================================
+  const updateResidentFromPendaftaran = async (
+    id: string,
+    formData: {
+      name?: string;
+      phone_number?: string;
+      address?: string;
+      status?: string;
+      tanggal_masuk?: string;
+    }
+  ) => {
+    setIsLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(
+        `https://asramaputrakukar.my.id/api/v1/residents/${id}/from-pendaftaran`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            'x-api-key': '881182541952993820593968'
+          },
+          body: JSON.stringify(formData)
+        }
+      );
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        toast({
+          variant: 'success',
+          title: 'Success',
+          description: 'Data penghuni berhasil diperbarui',
+        });
+        return { success: true, data: result.data };
+      } else {
+        toast({
+          variant: 'failed',
+          title: 'Error',
+          description: result.message || 'Gagal memperbarui penghuni',
+        });
+        return { success: false, data: null };
+      }
+    } catch (err) {
+      console.error(err);
+      toast({
+        variant: 'failed',
+        title: 'Error',
+        description: 'Terjadi kesalahan saat memperbarui penghuni',
+      });
+      return { success: false, data: null };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // ==============================================
+  // 🔥 CREATE RESIDENT (SUDAH ADA)
+  // ==============================================
   const createResident = async (formData: ResidentAddForm, onSuccess?: () => void) => {
     setIsLoading(true);
 
@@ -43,6 +265,9 @@ export function useQueryClient() {
     }
   };
 
+  // ==============================================
+  // 🔥 DETAIL RESIDENT (SUDAH ADA)
+  // ==============================================
   const detailResident = async (
     id: string | number, 
     onSuccess?: () => void
@@ -65,6 +290,9 @@ export function useQueryClient() {
     }
   };
 
+  // ==============================================
+  // 🔥 UPDATE RESIDENT (SUDAH ADA)
+  // ==============================================
   const updateResident = async (formData: ResidentEditForm, id: string | number, onSuccess?: () => void) => {
     setIsLoading(true);
 
@@ -97,8 +325,21 @@ export function useQueryClient() {
     }
   };
 
+  // ==============================================
+  // 🔥 REFRESH DATA
+  // ==============================================
+  const refreshResidents = async () => {
+    return await getAllResidents();
+  };
+
   return {
     isLoading,
+    residents,
+    getAllResidents,
+    getResidentByUserId,
+    createResidentFromPendaftaran,
+    updateResidentFromPendaftaran,
+    refreshResidents,
     createResident,
     detailResident,
     updateResident

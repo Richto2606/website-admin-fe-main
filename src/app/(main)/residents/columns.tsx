@@ -65,12 +65,36 @@ export const columns: ColumnDef<Resident>[] = [
     cell: ({ row }) => <ProjectTextOrdering name={row.getValue("name")} width="20" />,
     enableSorting: true,
   },
+  // 🔥 KOLOM NO HP (BARU)
+  {
+    accessorKey: "phone_number",
+    header: ({ column }) => (
+      <SortableHeader column={column} title="No HP" />
+    ),
+    cell: ({ row }) => {
+      const phone = row.getValue("phone_number") as string;
+      return <ProjectTextOrdering name={phone || "-"} width="20" />;
+    },
+    enableSorting: true,
+  },
+  // 🔥 KOLOM ALAMAT (BARU)
+  {
+    accessorKey: "address",
+    header: ({ column }) => (
+      <SortableHeader column={column} title="Alamat" />
+    ),
+    cell: ({ row }) => {
+      const address = row.getValue("address") as string;
+      return <ProjectTextOrdering name={address || "-"} width="30" />;
+    },
+    enableSorting: true,
+  },
   {
     accessorKey: "age",
     header: ({ column }) => (
       <SortableHeader column={column} title="Umur" />
     ),
-    cell: ({ row }) => <ProjectTextOrdering name={`${row.getValue("age")}`} width="10" />,
+    cell: ({ row }) => <ProjectTextOrdering name={`${row.getValue("age") || "-"}`} width="10" />,
     enableSorting: true,
   },
   {
@@ -78,7 +102,7 @@ export const columns: ColumnDef<Resident>[] = [
     header: ({ column }) => (
       <SortableHeader column={column} title="Asal Kampus" />
     ),
-    cell: ({ row }) => <ProjectTextOrdering name={row.getValue("origin_campus")} width="20" />,
+    cell: ({ row }) => <ProjectTextOrdering name={row.getValue("origin_campus") || "-"} width="20" />,
     enableSorting: true,
   },
   {
@@ -86,7 +110,7 @@ export const columns: ColumnDef<Resident>[] = [
     header: ({ column }) => (
       <SortableHeader column={column} title="Asal Kota" />
     ),
-    cell: ({ row }) => <ProjectTextOrdering name={row.getValue("origin_city")} width="20" />,
+    cell: ({ row }) => <ProjectTextOrdering name={row.getValue("origin_city") || "-"} width="20" />,
     enableSorting: true,
   },
   {
@@ -94,7 +118,23 @@ export const columns: ColumnDef<Resident>[] = [
     header: ({ column }) => (
       <SortableHeader column={column} title="No Kamar" />
     ),
-    cell: ({ row }) => <ProjectTextOrdering name={row.getValue("room_number")} width="20" />,
+    cell: ({ row }) => <ProjectTextOrdering name={row.getValue("room_number") || "-"} width="20" />,
+    enableSorting: true,
+  },
+  // 🔥 KOLOM TANGGAL MASUK (BARU)
+  {
+    accessorKey: "tanggal_masuk",
+    header: ({ column }) => (
+      <SortableHeader column={column} title="Tgl Masuk" />
+    ),
+    cell: ({ row }) => {
+      const tanggal = row.getValue("tanggal_masuk") as string;
+      if (tanggal) {
+        const date = new Date(tanggal);
+        return <ProjectTextOrdering name={date.toLocaleDateString('id-ID')} width="15" />;
+      }
+      return <ProjectTextOrdering name="-" width="15" />;
+    },
     enableSorting: true,
   },
   {
@@ -102,7 +142,14 @@ export const columns: ColumnDef<Resident>[] = [
     header: ({ column }) => (
       <SortableHeader column={column} title="Status" />
     ),
-    cell: ({ row }) => <ProjectDesignBadge name={row.getValue("status")} width="30" />,
+    cell: ({ row }) => {
+      const status = row.getValue("status") as string;
+      // Ubah status 'active' menjadi 'Aktif' untuk tampilan
+      const displayStatus = status === 'active' ? 'Aktif' : 
+                           status === 'inactive' ? 'Nonaktif' : 
+                           status || 'Aktif';
+      return <ProjectDesignBadge name={displayStatus} width="30" />;
+    },
     enableSorting: true,
   },
   {

@@ -29,7 +29,7 @@ export default function ValidasiTable() {
   const [error, setError] = useState('');
   const [filterStatus, setFilterStatus] = useState('semua');
 
-  // 🔥 FETCH DATA DARI API
+  // FETCH DATA DARI API
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -81,19 +81,204 @@ export default function ValidasiTable() {
     fetchData();
   }, []);
 
-  // 🔥 FUNGSI UPDATE STATUS
-  const updateStatus = async (id: number, status: string) => {
+  // ==============================================
+  // 🔥 FUNGSI TERIMA PENDAFTARAN (BARU)
+  // ==============================================
+  const terimaPendaftaran = async (id: number, dataPendaftaran: Pendaftaran) => {
+    try {
+      const token = localStorage.getItem('token');
+      
+      // STEP 1: Konfirmasi
+      const result = await Swal.fire({
+        title: '✅ Konfirmasi Penerimaan',
+        html: `
+          <div style="text-align:left;">
+            <p>Apakah Anda yakin ingin menerima pendaftaran ini?</p>
+            <p style="font-weight:bold; margin-top:10px;">${dataPendaftaran.nama_lengkap}</p>
+            <p style="font-size:14px; color:#666;">NIM: ${dataPendaftaran.nim}</p>
+            <p style="font-size:14px; color:#666;">Universitas: ${dataPendaftaran.universitas}</p>
+            <hr style="margin:10px 0; border:1px solid #eee;">
+            <p style="color:#059669; font-weight:bold;">📌 Data akan otomatis masuk ke Kelola Penghuni</p>
+          </div>
+        `,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#059669',
+        cancelButtonColor: '#d33',
+        confirmButtonText: '✅ Ya, Terima',
+        cancelButtonText: 'Batal'
+      });
+
+      if (!result.isConfirmed) return;
+
+      // STEP 2: Update status pendaftaran menjadi "Diterima"
+      console.log('📝 STEP 2: Update status pendaftaran...');
+      const updateResponse = await fetch(`https://asramaputrakukar.my.id/api/v1/pendaftaran/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'x-api-key': '881182541952993820593968'
+        },
+        body: JSON.stringify({ status_pendaftaran: 'Diterima' })
+      });
+
+      if (!updateResponse.ok) {
+        throw new Error('Gagal mengupdate status pendaftaran');
+      }
+      console.log('✅ Status pendaftaran berhasil diupdate');
+
+      // STEP 3: Cek apakah user sudah punya data di residents
+      console.log('🔍 STEP 3: Cek data resident untuk user_id:', dataPendaftaran.user_id);
+      const checkResidentResponse = await fetch(
+        `https://asramaputrakukar.my.id/api/v1/residents/user/${dataPendaftaran.user_id}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'x-api-key': '881182541952993820593968'
+          }
+        }
+      );
+
+      let residentData = null;
+      if (checkResidentResponse.ok) {
+        const result = await checkResidentResponse.json();
+        if (result.success && result.data) {
+          residentData = result.data;
+        }
+      }
+
+      // STEP 4: Jika user sudah punya data resident, UPDATE
+      if (residentData) {
+        console.log('📝 STEP 4A: User sudah punya resident, update data...');
+        const updateResidentResponse = await fetch(`https://asramaputrakukar.my.id/api/v1/residents/${residentData.id}/from-pendaftaran`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            'x-api-key': '881182541952993820593968'
+          },
+          body: JSON.stringify({
+            name: dataPendaftaran.nama_lengkap,
+            phone_number: dataPendaftaran.no_hp,
+            address: dataPendaftaran.alamat_asal,
+            status: 'Aktif',
+            tanggal_masuk: new Date().toISOString().split('T')[0]
+          })
+        });
+
+        if (!updateResidentResponse.ok) {
+          throw new Error('Gagal mengupdate data resident');
+        }
+        console.log('✅ Data resident berhasil diupdate');
+
+      // STEP 5: Jika user belum punya data resident, CREATE BARU
+      } else {
+        console.log('📝 STEP 4B: User belum punya resident, buat baru...');
+        const createResidentResponse = await fetch('https://asramaputrakukar.my.id/api/v1/residents/from-pendaftaran', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            'x-api-key': '881182541952993820593968'
+          },
+          body: JSON.stringify({
+            user_id: dataPendaftaran.user_id,
+            name: dataPendaftaran.nama_lengkap,
+            phone_number: dataPendaftaran.no_hp,
+            address: dataPendaftaran.alamat_asal,
+            status: 'Aktif'
+          })
+        });
+
+        if (!createResidentResponse.ok) {
+          const errorText = await createResidentResponse.text();
+          console.error('❌ Error response:', errorText);
+          throw new Error(`Gagal menambahkan resident: ${createResidentResponse.status}`);
+        }
+        console.log('✅ Resident baru berhasil dibuat');
+      }
+
+      // STEP 6: Update data lokal
+      console.log('📝 STEP 5: Update data lokal...');
+      setData(prev => 
+        prev.map(item => 
+          item.id_pendaftaran === id 
+            ? { ...item, status_pendaftaran: 'Diterima' } 
+            : item
+        )
+      );
+
+      // STEP 7: Tampilkan notifikasi sukses
+      console.log('🎉 STEP 6: Proses selesai!');
+      await Swal.fire({
+        icon: 'success',
+        title: '🎉 Berhasil!',
+        html: `
+          <p><strong>${dataPendaftaran.nama_lengkap}</strong> telah diterima!</p>
+          <p style="color:#059669; font-size:14px;">✅ Data telah otomatis masuk ke Kelola Penghuni</p>
+          <p style="font-size:12px; color:#888; margin-top:10px;">
+            Status: Diterima | Tanggal Masuk: ${new Date().toLocaleDateString('id-ID')}
+          </p>
+        `,
+        timer: 3000,
+        showConfirmButton: true,
+        confirmButtonColor: '#059669',
+        confirmButtonText: 'Lihat Penghuni'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.href = '/admin/kelola-penghuni';
+        }
+      });
+
+    } catch (error: any) {
+      console.error('❌ Error dalam proses penerimaan:', error);
+      
+      // 🔥 Jika gagal, rollback status pendaftaran
+      try {
+        const token = localStorage.getItem('token');
+        await fetch(`https://asramaputrakukar.my.id/api/v1/pendaftaran/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            'x-api-key': '881182541952993820593968'
+          },
+          body: JSON.stringify({ status_pendaftaran: 'Menunggu' })
+        });
+        console.log('↩️ Rollback status pendaftaran berhasil');
+      } catch (rollbackError) {
+        console.error('❌ Gagal rollback status:', rollbackError);
+      }
+
+      Swal.fire({
+        icon: 'error',
+        title: '❌ Gagal!',
+        text: error.message || 'Terjadi kesalahan saat menerima pendaftaran. Silakan coba lagi.',
+        confirmButtonColor: '#d33'
+      });
+    }
+  };
+
+  // ==============================================
+  // 🔥 FUNGSI TOLAK PENDAFTARAN (BARU)
+  // ==============================================
+  const tolakPendaftaran = async (id: number, nama: string) => {
     try {
       const token = localStorage.getItem('token');
       
       const result = await Swal.fire({
-        title: 'Konfirmasi',
-        text: `Apakah Anda yakin ingin mengubah status menjadi ${status}?`,
+        title: '❌ Konfirmasi Penolakan',
+        text: `Apakah Anda yakin ingin menolak pendaftaran ${nama}?`,
         icon: 'question',
         showCancelButton: true,
-        confirmButtonColor: '#1F3877',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Ya, Ubah',
+        confirmButtonColor: '#dc2626',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Ya, Tolak',
         cancelButtonText: 'Batal'
       });
 
@@ -107,59 +292,73 @@ export default function ValidasiTable() {
           'Authorization': `Bearer ${token}`,
           'x-api-key': '881182541952993820593968'
         },
-        body: JSON.stringify({ status_pendaftaran: status })
+        body: JSON.stringify({ status_pendaftaran: 'Ditolak' })
       });
 
-      if (response.ok) {
-        // Update data lokal
-        setData(prev => 
-          prev.map(item => 
-            item.id_pendaftaran === id 
-              ? { ...item, status_pendaftaran: status } 
-              : item
-          )
-        );
-
-        Swal.fire({
-          icon: 'success',
-          title: 'Berhasil!',
-          text: `Status berhasil diubah menjadi ${status}`,
-          timer: 1500,
-          showConfirmButton: false
-        });
-      } else {
-        throw new Error('Gagal mengubah status');
+      if (!response.ok) {
+        throw new Error('Gagal menolak pendaftaran');
       }
+
+      setData(prev => 
+        prev.map(item => 
+          item.id_pendaftaran === id 
+            ? { ...item, status_pendaftaran: 'Ditolak' } 
+            : item
+        )
+      );
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Berhasil!',
+        text: `Pendaftaran ${nama} telah ditolak.`,
+        timer: 1500,
+        showConfirmButton: false
+      });
+
     } catch (error) {
-      console.error('Error update status:', error);
+      console.error('Error tolak pendaftaran:', error);
       Swal.fire({
         icon: 'error',
         title: 'Gagal!',
-        text: 'Terjadi kesalahan saat mengubah status.'
+        text: 'Terjadi kesalahan saat menolak pendaftaran.'
       });
     }
   };
 
+  // ==============================================
   // 🔥 FUNGSI LIHAT DETAIL
+  // ==============================================
   const viewDetail = (item: Pendaftaran) => {
     Swal.fire({
-      title: 'Detail Pendaftaran',
+      title: '📋 Detail Pendaftaran',
+      width: 600,
       html: `
-        <div style="text-align:left; font-size:14px;">
-          <p><strong>Nama:</strong> ${item.nama_lengkap}</p>
-          <p><strong>NIM:</strong> ${item.nim}</p>
-          <p><strong>Universitas:</strong> ${item.universitas}</p>
-          <p><strong>Program Studi:</strong> ${item.program_studi}</p>
-          <p><strong>Jenis Kelamin:</strong> ${item.jenis_kelamin}</p>
-          <p><strong>No HP:</strong> ${item.no_hp}</p>
+        <div style="text-align:left; font-size:14px; line-height:1.8;">
+          <p><strong>Nama Lengkap:</strong> ${item.nama_lengkap || '-'}</p>
+          <p><strong>NIM:</strong> ${item.nim || '-'}</p>
+          <p><strong>Universitas:</strong> ${item.universitas || '-'}</p>
+          <p><strong>Program Studi:</strong> ${item.program_studi || '-'}</p>
+          <p><strong>Jenis Kelamin:</strong> ${item.jenis_kelamin || '-'}</p>
+          <p><strong>No HP:</strong> ${item.no_hp || '-'}</p>
           <p><strong>Email:</strong> ${item.email || '-'}</p>
-          <p><strong>Alamat Asal:</strong> ${item.alamat_asal}</p>
+          <p><strong>Alamat Asal:</strong> ${item.alamat_asal || '-'}</p>
+          <hr style="margin: 8px 0; border: 1px solid #eee;" />
           <p><strong>Nama Wali:</strong> ${item.nama_wali || '-'}</p>
           <p><strong>Semester:</strong> ${item.semester || '-'}</p>
           <p><strong>No Orang Tua/Wali:</strong> ${item.no_ortu_wali || '-'}</p>
           <p><strong>Nama Orang Tua/Wali:</strong> ${item.nama_ortu_wali || '-'}</p>
+          <hr style="margin: 8px 0; border: 1px solid #eee;" />
+          <p><strong>Status:</strong> 
+            <span style="padding:2px 8px; border-radius:999px; font-size:12px; font-weight:bold; 
+              ${item.status_pendaftaran === 'Menunggu' ? 'background:#fef3c7;color:#92400e;' :
+                item.status_pendaftaran === 'Diterima' ? 'background:#d1fae5;color:#065f46;' :
+                'background:#fee2e2;color:#991b1b;'}">
+              ${item.status_pendaftaran || 'Menunggu'}
+            </span>
+          </p>
+          <p><strong>Tanggal Daftar:</strong> ${item.created_at ? new Date(item.created_at).toLocaleDateString('id-ID') : '-'}</p>
           <p><strong>File Berkas:</strong> ${item.file_berkas ? 
-            `<a href="https://asramaputrakukar.my.id/${item.file_berkas}" target="_blank" style="color:blue;">Lihat Berkas</a>` 
+            `<a href="https://asramaputrakukar.my.id/${item.file_berkas}" target="_blank" style="color:#2563eb; text-decoration:underline;">📎 Lihat Berkas</a>` 
             : '-'}</p>
         </div>
       `,
@@ -169,12 +368,14 @@ export default function ValidasiTable() {
     });
   };
 
-  // 🔥 FILTER DATA
+  // ==============================================
+  // FILTER DATA
+  // ==============================================
   const filteredData = filterStatus === 'semua' 
     ? data 
     : data.filter(item => item.status_pendaftaran === filterStatus);
 
-  // 🔥 RENDER LOADING
+  // RENDER LOADING
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -184,7 +385,7 @@ export default function ValidasiTable() {
     );
   }
 
-  // 🔥 RENDER ERROR
+  // RENDER ERROR
   if (error) {
     return (
       <div className="p-6 text-center">
@@ -202,7 +403,7 @@ export default function ValidasiTable() {
     );
   }
 
-  // 🔥 RENDER TABLE
+  // RENDER TABLE
   return (
     <div className="p-4">
       <div className="flex flex-wrap justify-between items-center mb-4 gap-2">
@@ -214,12 +415,12 @@ export default function ValidasiTable() {
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-3 py-1 border border-gray-300 rounded text-sm"
+            className="px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="semua">Semua Status</option>
-            <option value="Menunggu">Menunggu</option>
-            <option value="Diterima">Diterima</option>
-            <option value="Ditolak">Ditolak</option>
+            <option value="Menunggu">🟡 Menunggu</option>
+            <option value="Diterima">🟢 Diterima</option>
+            <option value="Ditolak">🔴 Ditolak</option>
           </select>
         </div>
       </div>
@@ -274,25 +475,35 @@ export default function ValidasiTable() {
                     <div className="flex gap-1 flex-wrap">
                       <button
                         onClick={() => viewDetail(item)}
-                        className="px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600"
+                        className="px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600 transition"
                       >
-                        Detail
+                        📋 Detail
                       </button>
-                      {item.status_pendaftaran !== 'Diterima' && (
-                        <button
-                          onClick={() => updateStatus(item.id_pendaftaran, 'Diterima')}
-                          className="px-2 py-1 bg-green-500 text-white text-xs rounded hover:bg-green-600"
-                        >
-                          Terima
-                        </button>
+                      {item.status_pendaftaran === 'Menunggu' && (
+                        <>
+                          <button
+                            onClick={() => terimaPendaftaran(item.id_pendaftaran, item)}
+                            className="px-2 py-1 bg-green-500 text-white text-xs rounded hover:bg-green-600 transition"
+                          >
+                            ✅ Terima
+                          </button>
+                          <button
+                            onClick={() => tolakPendaftaran(item.id_pendaftaran, item.nama_lengkap)}
+                            className="px-2 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600 transition"
+                          >
+                            ❌ Tolak
+                          </button>
+                        </>
                       )}
-                      {item.status_pendaftaran !== 'Ditolak' && (
-                        <button
-                          onClick={() => updateStatus(item.id_pendaftaran, 'Ditolak')}
-                          className="px-2 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600"
-                        >
-                          Tolak
-                        </button>
+                      {item.status_pendaftaran === 'Diterima' && (
+                        <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">
+                          ✓ Sudah Diterima
+                        </span>
+                      )}
+                      {item.status_pendaftaran === 'Ditolak' && (
+                        <span className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded">
+                          ✗ Ditolak
+                        </span>
                       )}
                     </div>
                   </td>

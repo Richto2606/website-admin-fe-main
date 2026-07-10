@@ -2,11 +2,12 @@ import { formatMessage } from "@interfaces/data-types";
 import axios, { AxiosResponse } from "axios";
 
 const SatellitePublic = axios.create({
-  baseURL: 'https://asramaputrakukar.my.id/api/v1',
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || 'https://asramaputrakukar.my.id/api/v1',
   timeout: 30000,
   headers: {
     "Content-Type": "application/json",
-    "X-API-KEY": '881182541952993820593968', 
+    "Accept": "application/json",
+    "X-API-KEY": process.env.NEXT_PUBLIC_API_KEY || '881182541952993820593968',
   },
 });
 

@@ -1,36 +1,73 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Website Admin FE
 
-## Getting Started
+Frontend admin untuk aplikasi Asrama Kutai Kartanegara. Aplikasi ini memakai Next.js dan mengambil data dari backend Laravel melalui environment variable.
 
-First, run the development server:
+## Local Development
+
+1. Install dependency:
+
+```bash
+npm install
+```
+
+2. Buat file `.env.local` dari contoh:
+
+```bash
+cp .env.example .env.local
+```
+
+Di Windows PowerShell:
+
+```powershell
+Copy-Item .env.example .env.local
+```
+
+3. Isi `.env.local` untuk backend lokal:
+
+```env
+NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8000/api/v1
+NEXT_PUBLIC_BASE_URL=http://127.0.0.1:8000
+NEXT_PUBLIC_API_KEY=isi_sesuai_API_KEY_backend
+NEXT_PUBLIC_NODE_ENV=development
+```
+
+Nilai `NEXT_PUBLIC_API_KEY` harus sama dengan `API_KEY` di file `.env` backend Laravel.
+
+4. Jalankan backend Laravel:
+
+```bash
+php artisan serve --host=127.0.0.1 --port=8000
+```
+
+5. Jalankan frontend:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Buka `http://localhost:3000/login`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Production
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Saat deploy ke production, jangan hardcode URL API di source code. Set environment variable di server, Vercel, atau panel hosting:
 
-## Learn More
+```env
+NEXT_PUBLIC_API_BASE_URL=https://domain-backend-anda.com/api/v1
+NEXT_PUBLIC_BASE_URL=https://domain-backend-anda.com
+NEXT_PUBLIC_API_KEY=isi_sesuai_API_KEY_production
+NEXT_PUBLIC_NODE_ENV=production
+```
 
-To learn more about Next.js, take a look at the following resources:
+Setelah env production diubah, build ulang aplikasi:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run build
+npm run start
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Catatan Penting
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `NEXT_PUBLIC_API_BASE_URL` harus langsung mengarah ke prefix API backend, misalnya `/api/v1`.
+- `NEXT_PUBLIC_API_KEY` harus sama dengan `API_KEY` di `.env` backend Laravel.
+- Untuk local, gunakan `http://127.0.0.1:8000`, bukan `https://127.0.0.1:8000`, kecuali backend lokal memang memakai SSL.
+- Setelah mengubah `.env.local`, restart server Next.js.

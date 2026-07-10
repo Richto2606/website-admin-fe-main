@@ -1,10 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ThemeProviderProps } from 'next-themes';
-import Provider from '@components/provider';
+import Provider, { AppProviderProps } from '@components/provider';
 
-export function ContainerProvider({ children, ...props }: ThemeProviderProps) {
+export function ContainerProvider({ children, ...props }: AppProviderProps) {
   
   const [mounted, setMounted] = useState(false);
 

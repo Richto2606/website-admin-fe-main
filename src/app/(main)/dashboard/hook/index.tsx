@@ -14,7 +14,8 @@ export function useQueryClient() {
     setIsLoading(true);
 
     try {
-      const response = await getResidentActive(signal);
+      if (signal?.aborted) return null;
+      const response = await getResidentActive();
       if (response?.success && response.data) {
         if (onSuccess) onSuccess();
         return response.data;
@@ -38,7 +39,8 @@ export function useQueryClient() {
     setIsLoading(true);
 
     try {
-      const response = await getKamarTerpakai(signal);
+      if (signal?.aborted) return null;
+      const response = await getKamarTerpakai();
       if (response?.success && response.data) {
         if (onSuccess) onSuccess();
         return response.data;
@@ -63,7 +65,8 @@ export function useQueryClient() {
     setIsLoading(true);
 
     try {
-      const response = await getPemasukanBulanan(bulan, signal);
+      if (signal?.aborted) return null;
+      const response = await getPemasukanBulanan(bulan);
       if (response?.success && response.data) {
         if (onSuccess) onSuccess();
         return response.data;
@@ -88,7 +91,8 @@ export function useQueryClient() {
     setIsLoading(true);
 
     try {
-      const response = await getPengeluaranBulanan(bulan, signal);
+      if (signal?.aborted) return null;
+      const response = await getPengeluaranBulanan(bulan);
       if (response?.success && response.data) {
         if (onSuccess) onSuccess();
         return response.data;
@@ -112,7 +116,8 @@ export function useQueryClient() {
     setIsLoading(true);
 
     try {
-      const response = await getSinkronisasiPayment(signal);
+      if (signal?.aborted) return null;
+      const response = await getSinkronisasiPayment();
       if (response?.success && response.data) {
         if (onSuccess) onSuccess();
         return response.data;

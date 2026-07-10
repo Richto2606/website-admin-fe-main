@@ -18,12 +18,12 @@ const processQueue = (error: any, token: string | null = null) => {
 };
 
 const SatellitePrivate: AxiosInstance = axios.create({
-  baseURL: process.env.NEXT_BASE_URL_API || 'https://asramaputrakukar.my.id/api/v1',
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || 'https://asramaputrakukar.my.id/api/v1',
   timeout: 30000,
   headers: {
     "Content-Type": "application/json",
     "Accept": "application/json",
-    "x-api-key": process.env.NEXT_API_KEY || '881182541952993820593968',
+    "x-api-key": process.env.NEXT_PUBLIC_API_KEY || '881182541952993820593968',
   },
 });
 

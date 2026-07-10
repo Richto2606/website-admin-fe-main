@@ -3,6 +3,22 @@
 import React, { useState, useEffect } from 'react';
 import Swal from 'sweetalert2';
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://asramaputrakukar.my.id/api/v1';
+const API_KEY = process.env.NEXT_PUBLIC_API_KEY || '';
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || API_BASE_URL.replace('/api/v1', '');
+
+function getAuthToken() {
+  const localToken = localStorage.getItem('token') || localStorage.getItem('TOKEN_AUTH');
+
+  if (localToken) {
+    return localToken;
+  }
+
+  const match = document.cookie.match(new RegExp('(^| )TOKEN_AUTH=([^;]+)'));
+
+  return match ? decodeURIComponent(match[2]) : null;
+}
+
 interface Pendaftaran {
   id_pendaftaran: number;
   user_id: number;
@@ -33,7 +49,7 @@ export default function ValidasiTable() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem('token');
+        const token = getAuthToken();
         
         if (!token) {
           setError('Token tidak ditemukan. Silakan login kembali.');
@@ -43,13 +59,13 @@ export default function ValidasiTable() {
 
         console.log('🔍 Fetching pendaftaran data...');
         
-        const response = await fetch('https://asramaputrakukar.my.id/api/v1/pendaftaran', {
+        const response = await fetch(`${API_BASE_URL}/pendaftaran`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
             'Authorization': `Bearer ${token}`,
-            'x-api-key': '881182541952993820593968'
+            'x-api-key': API_KEY
           },
           cache: 'no-store'
         });
@@ -84,7 +100,7 @@ export default function ValidasiTable() {
   // FUNGSI UPDATE STATUS
   const updateStatus = async (id: number, status: string) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = getAuthToken();
       
       const result = await Swal.fire({
         title: 'Konfirmasi',
@@ -99,13 +115,13 @@ export default function ValidasiTable() {
 
       if (!result.isConfirmed) return;
 
-      const response = await fetch(`https://asramaputrakukar.my.id/api/v1/pendaftaran/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/pendaftaran/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
           'Authorization': `Bearer ${token}`,
-          'x-api-key': '881182541952993820593968'
+          'x-api-key': API_KEY
         },
         body: JSON.stringify({ status_pendaftaran: status })
       });
@@ -170,7 +186,7 @@ export default function ValidasiTable() {
           </p>
           <p><strong>Tanggal Daftar:</strong> ${item.created_at ? new Date(item.created_at).toLocaleDateString('id-ID') : '-'}</p>
           <p><strong>File Berkas:</strong> ${item.file_berkas ? 
-            `<a href="https://asramaputrakukar.my.id/${item.file_berkas}" target="_blank" style="color:#2563eb; text-decoration:underline;">📎 Lihat Berkas</a>` 
+            `<a href="${BASE_URL}/${item.file_berkas}" target="_blank" style="color:#2563eb; text-decoration:underline;">📎 Lihat Berkas</a>` 
             : '-'}</p>
         </div>
       `,

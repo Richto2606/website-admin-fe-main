@@ -25,12 +25,12 @@ import { LoginFormSchema } from '@services/auth/definitions';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Eye, EyeOff, LogIn } from 'lucide-react';
-import SatellitePublic from '@services/satellite/public'; 
+import { login } from '@services/auth/01-auth';
 
 export function LoginForm() {
   const router = useRouter();
   const { toast } = useToast();
-  const [showPassword, setShowPassword] = useState(false); 
+  const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
   const form = useForm<z.infer<typeof LoginFormSchema>>({
@@ -45,16 +45,15 @@ export function LoginForm() {
 
   const handleSubmit = async (values: z.infer<typeof LoginFormSchema>) => {
     setErrorMessage('');
-    
+
     try {
-      const res = await SatellitePublic.post('/auth/login', {
-        email: values.email,
-        password: values.password,
-      });
+      const formData = new FormData();
+      formData.append('email', values.email);
+      formData.append('password', values.password);
 
-      const response = res.data;
+      const response = await login(undefined, formData) as any;
 
-      if (response.success || response.data) {
+      if (response?.status && response.data) {
         toast({
           variant: 'success',
           title: 'Login Berhasil',
@@ -66,39 +65,32 @@ export function LoginForm() {
         const token = user?.access_token;
 
         if (!token) {
-           console.error("Token kosong:", response);
-           alert("Gagal mengambil token login.");
-           return;
+          alert('Gagal mengambil token login.');
+          return;
         }
-
-        console.log('🔍 ===== LOGIN DEBUG =====');
-        console.log('🔍 Token:', token);
-        console.log('🔍 User:', user);
-        console.log('🔍 User Role:', userRole);
-
-        document.cookie = `TOKEN_AUTH=${token}; path=/; max-age=86400; SameSite=Lax`;
-        document.cookie = `USER_NAME=${user.name}; path=/; max-age=86400; SameSite=Lax`;
-        document.cookie = `USER_EMAIL=${user.email}; path=/; max-age=86400; SameSite=Lax`;
-        document.cookie = `USER_ROLE=${userRole}; path=/; max-age=86400; SameSite=Lax`;
 
         localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify(user));
 
-        console.log('🔍 Token from localStorage:', localStorage.getItem('token'));
-
         if (userRole === 'Admin' || userRole === 'admin') {
-          console.log('🔍 Redirecting to Dashboard (Admin)');
           router.replace('/dashboard');
           router.refresh();
         } else {
-          console.log('🔍 Redirecting to Public Main (Beranda)');
           window.location.href = `https://website-public-main.vercel.app/?token=${token}`;
         }
+      } else {
+        const errorMsg = response?.message || 'Email atau password salah.';
+        setErrorMessage(errorMsg);
+        toast({
+          variant: 'failed',
+          title: 'Login Gagal',
+          description: errorMsg,
+        });
       }
     } catch (error: any) {
       console.error('LOGIN ERROR:', error);
       let errorMsg = 'Terjadi kesalahan saat login.';
-      
+
       if (error.response) {
         errorMsg = error.response.data?.message || 'Email atau password salah.';
       } else if (error.code === 'ERR_NETWORK') {
@@ -115,7 +107,6 @@ export function LoginForm() {
   };
 
   return (
-    // 🔥 HAPUS SHADOW & BORDER
     <Card className="bg-white shadow-none border-0">
       <CardHeader>
         <CardTitle className="text-black text-2xl font-bold">Login</CardTitle>
@@ -126,7 +117,6 @@ export function LoginForm() {
       <CardContent className='space-y-2'>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className='space-y-6'>
-            
             {errorMessage && (
               <div className="p-3 bg-red-100 text-red-600 text-sm rounded-md">
                 {errorMessage}

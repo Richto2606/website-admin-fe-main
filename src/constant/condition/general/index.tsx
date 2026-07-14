@@ -46,7 +46,7 @@ const menuItems: Array<{
   
   // <--- 3. TAMBAHKAN MENU VALIDASI PENGHUNI DI SINI --->
   {
-    label: 'Validasi Penghuni',
+    label: 'Kelola Pendaftaran',
     icon: UserCheck,
     link: '/validasi',
   },

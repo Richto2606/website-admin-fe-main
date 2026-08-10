@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import Breadcumbs from "@ui/breadcrumbs";
 import { DataTable } from '@ui/data-table';
 import { MessageResponse, Resident } from "@interfaces/data-types";
@@ -17,175 +17,123 @@ import Swal from 'sweetalert2';
 export default function ResidentsPage() {
   const [residents, setResidents] = useState<Resident[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [pagination, setPagination] = useState<MessageResponse>({
-    count: 1,
+  const [pagination, setPagination] = useState({
+    count: 0,
     current_page: 1,
-    previous_page: 0,
-    total_pages: 1,
-    success: true,
-    message: '',
-    data: residents
+    total_pages: 1
   });
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  
-  // 🔥 REF UNTUK MENYIMPAN JUMLAH PENGHUNI SEBELUMNYA
-  const previousCountRef = useRef<number>(0);
-  // 🔥 REF UNTUK MENYIMPAN NAMA PENGHUNI BARU
-  const newResidentsRef = useRef<Resident[]>([]);
 
-  // 🔥 FETCH RESIDENTS
-  const fetchResidents = async (page: number, query: string, showLoading: boolean = true, showNotification: boolean = true) => {
-    if (showLoading) {
-      setIsLoading(true);
-    }
+  // 🔥 FETCH RESIDENTS - VERSI SEDERHANA
+  const fetchResidents = async (page: number, query: string) => {
+    setIsLoading(true);
     try {
-      const res = await SatellitePrivate.get<MessageResponse>(
-        `/residents`,
+      console.log('🔍 Fetching residents...');
+      
+      const res = await SatellitePrivate.get(
+        '/residents',
         {
           params: {
-            name: query,
+            name: query || '',
             page: page + 1,
             limit: 10,
             sort_by: 'updated_at'
           }
         }
       );
-      const response = res.data;
-      const residentsData: Resident[] = Array.isArray(response.data) ? response.data : [];
-      
-      // 🔥 CEK APAKAH ADA PENGHUNI BARU
-      const previousCount = previousCountRef.current;
-      const currentCount = residentsData.length;
-      
-      // Jika data sebelumnya tidak kosong dan ada penambahan
-      if (previousCount > 0 && currentCount > previousCount && showNotification) {
-        // Cari data baru (data yang tidak ada di list sebelumnya)
-        const oldIds = new Set(residents.map(r => r.id));
-        const newResidents = residentsData.filter(r => !oldIds.has(r.id));
-        
-        if (newResidents.length > 0) {
-          newResidentsRef.current = newResidents;
-          
-          // 🔥 PERBAIKI: Gunakan properti yang tersedia di Resident
-          const names = newResidents.map(r => r.name).join(', ');
-          
-          // 🔥 PERBAIKI: Buat list nama dengan properti yang ada
-          const residentList = newResidents.map(r => {
-            let details = `🏠 <strong>${r.name}</strong>`;
-            if (r.phone_number) {
-              details += ` - 📱 ${r.phone_number}`;
+
+      console.log('📦 Raw response:', res);
+
+      // 🔥 AMBIL DATA DENGAN AMAN
+      let residentsData: Resident[] = [];
+      let count = 0;
+      let current_page = 1;
+      let total_pages = 1;
+
+      if (res && res.data) {
+        const response = res.data;
+        console.log('📦 Response data:', response);
+
+        // Cek berbagai kemungkinan format
+        if (response.data && Array.isArray(response.data)) {
+          residentsData = response.data;
+          count = response.count || residentsData.length;
+          current_page = response.current_page || page + 1;
+          total_pages = response.total_pages || 1;
+        } else if (Array.isArray(response)) {
+          residentsData = response;
+          count = residentsData.length;
+        } else if (response && typeof response === 'object') {
+          // Coba cari array di dalam response
+          for (const key in response) {
+            if (Array.isArray(response[key])) {
+              residentsData = response[key];
+              count = residentsData.length;
+              break;
             }
-            // 🔥 HAPUS tanggal_masuk karena tidak ada di interface Resident
-            // if (r.tanggal_masuk) {
-            //   details += ` - 📅 ${new Date(r.tanggal_masuk).toLocaleDateString('id-ID')}`;
-            // }
-            return details;
-          }).join('<br>');
-          
-          Swal.fire({
-            icon: 'info',
-            title: '📢 Penghuni Baru!',
-            html: `
-              <div style="text-align:left;">
-                <p style="font-size:16px; font-weight:bold; color:#059669;">
-                  ✅ ${newResidents.length} penghuni baru telah masuk!
-                </p>
-                <hr style="margin:10px 0; border:1px solid #eee;">
-                <p style="font-weight:bold;">Nama penghuni baru:</p>
-                <ul style="list-style:none; padding:0;">
-                  ${newResidents.map(r => `
-                    <li style="padding:4px 0; border-bottom:1px solid #f3f4f6;">
-                      🏠 <strong>${r.name}</strong> 
-                      ${r.phone_number ? `- 📱 ${r.phone_number}` : ''}
-                      ${r.created_at ? `- 📅 ${new Date(r.created_at).toLocaleDateString('id-ID')}` : ''}
-                    </li>
-                  `).join('')}
-                </ul>
-                <hr style="margin:10px 0; border:1px solid #eee;">
-                <p style="color:#6b7280; font-size:12px;">
-                  Total penghuni sekarang: <strong>${currentCount}</strong> orang
-                </p>
-              </div>
-            `,
-            confirmButtonColor: '#059669',
-            confirmButtonText: 'Lihat Semua',
-            timer: 5000,
-            timerProgressBar: true,
-            showCancelButton: true,
-            cancelButtonText: 'Tutup',
-            cancelButtonColor: '#6b7280'
-          }).then((result) => {
-            if (result.isConfirmed) {
-              // Scroll ke tabel atau refresh data
-              document.querySelector('.data-table')?.scrollIntoView({ behavior: 'smooth' });
-            }
-          });
+          }
         }
       }
-      
-      // 🔥 UPDATE DATA
+
+      console.log('✅ Data residents:', residentsData);
+      console.log('✅ Jumlah data:', residentsData.length);
+
+      // 🔥 UPDATE STATE
       setResidents(residentsData);
-      
-      // 🔥 PERBAIKI: Hapus duplicate data di pagination
       setPagination({
-        count: response.count || residentsData.length,
-        current_page: response.current_page || page + 1,
-        previous_page: response.previous_page || 0,
-        total_pages: response.total_pages || 1,
-        success: response.success !== undefined ? response.success : true,
-        message: response.message || 'Success',
-        data: residentsData
+        count: count,
+        current_page: current_page,
+        total_pages: total_pages
       });
-      
-      // 🔥 UPDATE REF COUNTER
-      previousCountRef.current = residentsData.length;
-      
+
     } catch (error) {
-      console.error("Error fetching residents:", error);
-      if (showLoading) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Gagal Memuat Data',
-          text: 'Terjadi kesalahan saat mengambil data penghuni. Silakan coba lagi.',
-          confirmButtonColor: '#d33'
-        });
+      console.error('❌ Error fetching residents:', error);
+      
+      let errorMessage = 'Gagal memuat data penghuni. Silakan coba lagi.';
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as any;
+        if (axiosError.response?.status === 401) {
+          errorMessage = 'Sesi login habis. Silakan login ulang.';
+        } else if (axiosError.code === 'ERR_NETWORK') {
+          errorMessage = 'Tidak dapat terhubung ke server. Pastikan backend berjalan.';
+        }
       }
+
+      Swal.fire({
+        icon: 'error',
+        title: 'Gagal Memuat Data',
+        text: errorMessage,
+        confirmButtonColor: '#d33'
+      });
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
     }
   };
 
-  // 🔥 REFRESH DATA (Pull to refresh)
+  // 🔥 REFRESH DATA
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    await fetchResidents(currentPage, searchQuery, false, true);
-    if (newResidentsRef.current.length > 0) {
-      // Sudah ditangani di fetchResidents
-      newResidentsRef.current = [];
-    } else {
-      Swal.fire({
-        icon: 'success',
-        title: 'Data Diperbarui',
-        text: 'Data penghuni berhasil diperbarui',
-        timer: 1500,
-        showConfirmButton: false
-      });
-    }
+    await fetchResidents(currentPage, searchQuery);
   };
 
-  useEffect(() => {
-    fetchResidents(currentPage, searchQuery);
-  }, [currentPage, searchQuery]);
-
+  // 🔥 SEARCH
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
     setCurrentPage(0);
-    // Reset counter saat search
-    previousCountRef.current = 0;
   };
+
+  // 🔥 PAGINATION
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  // 🔥 INITIAL FETCH
+  useEffect(() => {
+    fetchResidents(currentPage, searchQuery);
+  }, [currentPage, searchQuery]);
 
   const breadcrumbs = createTitleAndBreadcrumbs(residentString, residentUrl);
 
@@ -208,7 +156,6 @@ export default function ResidentsPage() {
                   <span className='ml-1 '>Tambah {residentString}</span>
                 </Button>
               </Link>
-              {/* 🔥 TOMBOL REFRESH */}
               <Button
                 variant='outline'
                 size={null}
@@ -255,7 +202,7 @@ export default function ResidentsPage() {
                 <TableFooter
                   pageIndex={currentPage}
                   pageCount={pagination.total_pages || 1}
-                  onPageChange={(page) => setCurrentPage(page)}
+                  onPageChange={handlePageChange}
                 />
               }
             />

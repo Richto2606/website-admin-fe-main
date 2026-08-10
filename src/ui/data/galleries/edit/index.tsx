@@ -10,13 +10,17 @@ import { typeMediaGallery } from '@constant/condition/general';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@components/select';
 import { galleryString } from '@constant/breadcrumbs';
 import { addGalleryForm } from '@constant/data/gallery';
-import SatellitePrivate from '@services/satellite/private';
 import { CloudUpload, File } from 'lucide-react';
 import { bytesToMb } from '@utils/format';
 import { FileValidationResult } from '@interfaces/interface-items';
 import { validateFileImage, validateFileTypeImage } from '@utils/fileValidation';
 import { useToast } from '@interfaces/use-toast';
 import { Textarea } from '@components/textarea';
+import axios from 'axios'; // ✅ TAMBAHKAN INI
+
+// ✅ TAMBAHKAN INI
+const urlAPIBE = "http://127.0.0.1:8000/api/v1";
+const APIKEY = "881182541952993820593968";
 
 export default function EditGalleries({
   formData, 
@@ -39,13 +43,16 @@ export default function EditGalleries({
     },
   });
 
+  // ✅ PERBAIKI FETCH CATEGORIES
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await SatellitePrivate.get<formatMessage<Categories[]>>('/categories');
-        const response = res.data;
-        const categories =  response.data || [];
-        if (response.success === true) {
+        const response = await axios.get(`${urlAPIBE}/public/categories`, {
+          headers: { "X-API-KEY": APIKEY }
+        });
+        const res = response.data;
+        const categories = res.data || [];
+        if (res.success === true) {
           setCategories(categories);
         }
       } catch (error) {

@@ -13,8 +13,8 @@ import { useRouter } from 'next/navigation';
 import { useQueryClient } from '../hook';
 import axios from 'axios';
 
-// 🔥 TARUH LANGSUNG DI SINI (tanpa import dari constant)
-const urlAPIBE = "https://api.asramaputrakukar.my.id";
+// ✅ PERBAIKI INI
+const urlAPIBE = "http://127.0.0.1:8000/api/v1";
 const APIKEY = "881182541952993820593968";
 
 export default function AddGalleriesPage() {
@@ -31,11 +31,11 @@ export default function AddGalleriesPage() {
   const { isLoading, createGallery } = useQueryClient();
   const [categories, setCategories] = useState([]);
 
-  // 🔥 FETCH KATEGORI
+  // 🔥 FETCH KATEGORI - PERBAIKI URL
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get(`${urlAPIBE}/api/v1/public/categories`, {
+        const response = await axios.get(`${urlAPIBE}/public/categories`, {
           headers: { "X-API-KEY": APIKEY }
         });
         setCategories(response.data.data || []);

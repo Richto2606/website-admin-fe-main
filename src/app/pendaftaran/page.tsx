@@ -29,7 +29,8 @@ async function getPendaftaran(): Promise<Pendaftaran[]> {
   }
 
   try {
-    const res = await fetch('https://asramaputrakukar.my.id/api/v1/pendaftaran', {
+    // ✅ PERBAIKI URL
+    const res = await fetch('http://127.0.0.1:8000/api/v1/pendaftaran', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -109,7 +110,7 @@ export default async function PendaftaranPage() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {data.map((item: Pendaftaran, index: number) => ( // 🔥 TAMBAHKAN TIPE DI SINI
+            {data.map((item: Pendaftaran, index: number) => (
               <tr key={item.id_pendaftaran || index} className="hover:bg-gray-50 transition-colors duration-200">
                 <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{index + 1}</td>
                 <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">{item.nama_lengkap || '-'}</td>

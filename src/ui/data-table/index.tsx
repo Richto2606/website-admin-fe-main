@@ -19,7 +19,8 @@ import {
   getPaginationRowModel,
 } from "@tanstack/react-table";
 import TableHeader from "./table-header";
-import { columnVisibilityItems } from "@constant/condition/visibility-column";
+// 🔥 HAPUS IMPORT INI ATAU KOMENTARI
+// import { columnVisibilityItems } from "@constant/condition/visibility-column";
 
 export function DataTable<TData, TValue>({
   columns,
@@ -29,12 +30,14 @@ export function DataTable<TData, TValue>({
   const [rowSelection, setRowSelection] = useState({});
   const [sorting, setSorting] = useState<SortingState>([]);
 
-  const initialColumnVisibility = columnVisibilityItems.reduce((acc, item) => {
-    acc[item.id] = false;
-    return acc;
-  }, {} as Record<string, boolean>);
+  // 🔥 HAPUS INI
+  // const initialColumnVisibility = columnVisibilityItems.reduce((acc, item) => {
+  //   acc[item.id] = false;
+  //   return acc;
+  // }, {} as Record<string, boolean>);
 
-  const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>(initialColumnVisibility);
+  // 🔥 GANTI DENGAN INI (SEMUA KOLOM TAMPIL)
+  const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({});
 
   const table = useReactTable({
     data,
@@ -71,9 +74,10 @@ export function DataTable<TData, TValue>({
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => {
-                    if (columnVisibility[cell.column.id] === false) {
-                      return null;
-                    }
+                    // 🔥 HAPUS CEK INI ATAU KOMENTARI
+                    // if (columnVisibility[cell.column.id] === false) {
+                    //   return null;
+                    // }
                     return (
                       <TableCell key={cell.id}>
                         <div suppressHydrationWarning>{flexRender(cell.column.columnDef.cell, cell.getContext())}</div>

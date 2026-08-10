@@ -19,7 +19,7 @@ const ProjectFile = ({ name, file }: { name: string; file: string | null }) => {
     
   // --- INI BAGIAN YANG DIUBAH ---
   // Kita langsung tembak ke domain backend Anda karena 'file' sudah berisi '/storage/namafoto.png'
-  const url = file ? `https://asramaputrakukar.my.id${file}` : ""; 
+  const url = file ? `http://127.0.0.1:8000${file}` : ""; 
   // ------------------------------
 
   const shortenedName = formatShortName(name, 5, '.');

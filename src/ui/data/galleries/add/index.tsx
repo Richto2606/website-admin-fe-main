@@ -20,6 +20,11 @@ import {
   validateFileTypeImage
 } from '@utils/fileValidation';
 import { Textarea } from '@components/textarea';
+import axios from 'axios'; // ✅ TAMBAHKAN INI
+
+// ✅ TAMBAHKAN INI (sama seperti di halaman sebelumnya)
+const urlAPIBE = "http://127.0.0.1:8000/api/v1";
+const APIKEY = "881182541952993820593968";
 
 export default function AddGalleries({ onSubmit }: { onSubmit: (data: GalleryAddForm) => void }) {
   const { toast } = useToast();
@@ -41,10 +46,13 @@ export default function AddGalleries({ onSubmit }: { onSubmit: (data: GalleryAdd
     setIsMounted(true);
     const fetchCategories = async () => {
       try {
-        const res = await SatellitePrivate.get<formatMessage<Categories[]>>('/categories');
-        const response = res.data;
-        const categories =  response.data || [];
-        if (response.success === true) {
+        // ✅ PERBAIKI - Gunakan axios langsung
+        const response = await axios.get(`${urlAPIBE}/public/categories`, {
+          headers: { "X-API-KEY": APIKEY }
+        });
+        const res = response.data;
+        const categories = res.data || [];
+        if (res.success === true) {
           setCategories(categories);
         }
       } catch (error) {

@@ -2,7 +2,7 @@
 
 import { cookies } from 'next/headers';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://asramaputrakukar.my.id/api/v1';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:8000/api/v1';
 const API_KEY = process.env.NEXT_PUBLIC_API_KEY || '881182541952993820593968';
 
 async function getAuthHeaders() {

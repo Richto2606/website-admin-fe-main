@@ -5,8 +5,11 @@ import {
   postResident,
   getByIdResident,
   putResident, 
-  // 🔥 HAPUS getResidents karena tidak ada
 } from '@services/resident';
+
+// ✅ TAMBAHKAN INI (URL yang benar)
+const API_BASE_URL = 'http://127.0.0.1:8000/api/v1';
+const API_KEY = '881182541952993820593968';
 
 export function useQueryClient() {
   const { toast } = useToast();
@@ -14,7 +17,7 @@ export function useQueryClient() {
   const [residents, setResidents] = useState<Resident[]>([]);
 
   // ==============================================
-  // 🔥 GET ALL RESIDENTS (LANGSUNG PAKAI FETCH)
+  // 🔥 GET ALL RESIDENTS
   // ==============================================
   const getAllResidents = async (params?: {
     name?: string;
@@ -31,12 +34,13 @@ export function useQueryClient() {
       if (params?.limit) queryParams.append('limit', String(params.limit));
       if (params?.sort_by) queryParams.append('sort_by', params.sort_by);
       
-      const url = `https://asramaputrakukar.my.id/api/v1/residents?${queryParams.toString()}`;
+      // ✅ PERBAIKI URL
+      const url = `${API_BASE_URL}/residents?${queryParams.toString()}`;
       
       const response = await fetch(url, {
         headers: {
           'Authorization': `Bearer ${token}`,
-          'x-api-key': '881182541952993820593968'
+          'X-API-KEY': API_KEY
         }
       });
       
@@ -81,12 +85,13 @@ export function useQueryClient() {
     setIsLoading(true);
     try {
       const token = localStorage.getItem('token');
+      // ✅ PERBAIKI URL
       const response = await fetch(
-        `https://asramaputrakukar.my.id/api/v1/residents/user/${userId}`,
+        `${API_BASE_URL}/residents/user/${userId}`,
         {
           headers: {
             'Authorization': `Bearer ${token}`,
-            'x-api-key': '881182541952993820593968'
+            'X-API-KEY': API_KEY
           }
         }
       );
@@ -122,14 +127,15 @@ export function useQueryClient() {
     setIsLoading(true);
     try {
       const token = localStorage.getItem('token');
+      // ✅ PERBAIKI URL
       const response = await fetch(
-        'https://asramaputrakukar.my.id/api/v1/residents/from-pendaftaran',
+        `${API_BASE_URL}/residents/from-pendaftaran`,
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`,
-            'x-api-key': '881182541952993820593968'
+            'X-API-KEY': API_KEY
           },
           body: JSON.stringify({
             user_id: formData.user_id,
@@ -187,14 +193,15 @@ export function useQueryClient() {
     setIsLoading(true);
     try {
       const token = localStorage.getItem('token');
+      // ✅ PERBAIKI URL
       const response = await fetch(
-        `https://asramaputrakukar.my.id/api/v1/residents/${id}/from-pendaftaran`,
+        `${API_BASE_URL}/residents/${id}/from-pendaftaran`,
         {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`,
-            'x-api-key': '881182541952993820593968'
+            'X-API-KEY': API_KEY
           },
           body: JSON.stringify(formData)
         }

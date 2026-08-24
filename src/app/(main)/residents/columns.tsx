@@ -146,8 +146,8 @@ export const columns: ColumnDef<Resident>[] = [
       const status = row.getValue("status") as string;
       // Ubah status 'active' menjadi 'Aktif' untuk tampilan
       const displayStatus = status === 'active' ? 'Aktif' : 
-                           status === 'inactive' ? 'Nonaktif' : 
-                           status || 'Aktif';
+                           status === 'inactive' ? 'Tidak Aktif' : 
+                           status || 'Status Not Found';
       return <ProjectDesignBadge name={displayStatus} width="30" />;
     },
     enableSorting: true,

@@ -28,6 +28,7 @@ interface Pendaftaran {
   program_studi: string;
   jenis_kelamin: string;
   no_hp: string;
+  umur?: number;
   email: string;
   alamat_asal: string;
   nama_wali?: string;
@@ -355,14 +356,16 @@ export default function ValidasiTable() {
           <p><strong>Universitas:</strong> ${item.universitas || '-'}</p>
           <p><strong>Program Studi:</strong> ${item.program_studi || '-'}</p>
           <p><strong>Jenis Kelamin:</strong> ${item.jenis_kelamin || '-'}</p>
+          <p><strong>Umur:</strong> ${item.umur ?? '-'}</p>
           <p><strong>No HP:</strong> ${item.no_hp || '-'}</p>
           <p><strong>Email:</strong> ${item.email || '-'}</p>
+
           <p><strong>Alamat Asal:</strong> ${item.alamat_asal || '-'}</p>
           <hr style="margin: 8px 0; border: 1px solid #eee;" />
           <p><strong>Nama Wali:</strong> ${item.nama_wali || '-'}</p>
           <p><strong>Semester:</strong> ${item.semester || '-'}</p>
           <p><strong>No Orang Tua/Wali:</strong> ${item.no_ortu_wali || '-'}</p>
-          <p><strong>Nama Orang Tua/Wali:</strong> ${item.nama_ortu_wali || '-'}</p>
+          <p><strong>Nama Orang Tua/Wali (Ayah):</strong> ${item.nama_ortu_wali || '-'}</p>
           <hr style="margin: 8px 0; border: 1px solid #eee;" />
           <p><strong>Status:</strong> 
             <span style="padding:2px 8px; border-radius:999px; font-size:12px; font-weight:bold; 
@@ -456,6 +459,7 @@ export default function ValidasiTable() {
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Universitas</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Prodi</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">No HP</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Umur</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Email</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Aksi</th>
@@ -470,6 +474,7 @@ export default function ValidasiTable() {
                   <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{item.universitas || '-'}</td>
                   <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{item.program_studi || '-'}</td>
                   <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{item.no_hp || '-'}</td>
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{item.umur ?? '-'}</td>
                   <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
                     {item.email ? (
                       <a href={`mailto:${item.email}`} className="text-blue-600 hover:underline">

@@ -2,7 +2,8 @@ import { statusItems } from '@constant/condition/status';
 import * as Tooltip from '@radix-ui/react-tooltip';
 
 const ProjectDesignBadge = ({ name, width = null }: { name: string, width: string | null; }) => {
-  const statusItem = statusItems.find(item => item.key === name) || statusItems.find(item => item.key === 'not-found');
+  const normalizedName = name === 'Aktif' ? 'active' : name === 'Tidak Aktif' ? 'inactive' : name;
+  const statusItem = statusItems.find(item => item.key === normalizedName) || statusItems.find(item => item.key === 'not-found');
   return (
     <div className={`flex flex-row items-center gap-3 py-1 cursor-pointer group ${width ? `w-${width}` : ''}`}>
       <Tooltip.Provider>

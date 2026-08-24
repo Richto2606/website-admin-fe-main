@@ -56,8 +56,7 @@ export default function ResidentsPage() {
         const response = res.data;
         console.log('📦 Response data:', response);
 
-        // Cek berbagai kemungkinan format
-        if (response.data && Array.isArray(response.data)) {
+        if (Array.isArray(response.data)) {
           residentsData = response.data;
           count = response.count || residentsData.length;
           current_page = response.current_page || page + 1;
@@ -65,15 +64,6 @@ export default function ResidentsPage() {
         } else if (Array.isArray(response)) {
           residentsData = response;
           count = residentsData.length;
-        } else if (response && typeof response === 'object') {
-          // Coba cari array di dalam response
-          for (const key in response) {
-            if (Array.isArray(response[key])) {
-              residentsData = response[key];
-              count = residentsData.length;
-              break;
-            }
-          }
         }
       }
 

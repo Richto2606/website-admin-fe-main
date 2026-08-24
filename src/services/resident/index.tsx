@@ -76,7 +76,7 @@ export async function putResident(formData: ResidentEditForm, id: string | numbe
       room_number_id: formData.room_number_id,
       address: formData.address,
       origin_city_id: formData.origin_city_id,
-      status: formData.status
+      status: 'active'
     }
 
     const res = await SatellitePrivate.put<formatMessage<Resident>>(
@@ -106,17 +106,17 @@ export async function putResident(formData: ResidentEditForm, id: string | numbe
 
 export async function deleteResident(id: string | number) {
   try {
-    const res = await SatellitePrivate.delete<any>(
-      `/residents/${id}`
+    const res = await SatellitePrivate.put<any>(
+      `/residents/${id}`,
+      { status: 'inactive' }
     );
     
-    // Periksa apakah HTTP status sukses DAN isi respon juga menyatakan sukses
     const isSuccess = (res.status >= 200 && res.status < 300) && 
                       (res.data?.success !== false && res.data?.status !== false);
 
     return {
       status: isSuccess,
-      message: res.data?.message || (isSuccess ? 'Penghuni berhasil dihapus' : 'Gagal menghapus penghuni'),
+      message: res.data?.message || (isSuccess ? 'Penghuni berhasil dinonaktifkan' : 'Gagal menonaktifkan penghuni'),
     };
   } catch (error) {
     if (axios.isAxiosError(error)) {

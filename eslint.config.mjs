@@ -10,6 +10,9 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
+  {
+    ignores: [".next/**"],
+  },
   ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
     // Tambahkan blok rules di sini untuk menonaktifkan pengecekan yang ketat

@@ -10,5 +10,9 @@ export default async function HomePage() {
     redirect('/dashboard');
   }
 
+  if (token && role === 'bendahara') {
+    redirect('/payments');
+  }
+
   redirect('/login');
 }

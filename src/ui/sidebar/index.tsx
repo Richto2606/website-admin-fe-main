@@ -6,15 +6,17 @@ import {
 } from '@components/command';
 import { menuItems } from '@constant/condition/general';
 import Link from 'next/link';
+import { cookies } from 'next/headers';
 
-const Sidebar = () => {
+const Sidebar = async () => {
+  const role = (await cookies()).get('USER_ROLE')?.value?.toLowerCase();
   return (
     // 🔥 UBAH: Background menjadi KUNING (#FCE124)
     <div className="mt-4 text-sm">
       <Command className="bg-[#FCE124] rounded-none px-4 flex flex-col gap-2 min-h-screen border-r border-black/10">
         <CommandList>
           <CommandEmpty>No results found.</CommandEmpty>
-          {menuItems.map((item, index) => (
+          {menuItems.filter((item) => item.roles.includes(role || '')).map((item, index) => (
             <CommandItem 
               key={index} 
               // 🔥 UBAH: Hover menjadi KUNING LEBIH GELAP (#FFD700)

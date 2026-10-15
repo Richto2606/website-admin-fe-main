@@ -27,21 +27,25 @@ const menuItems: Array<{
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   link: string;
+  roles: string[];
 }> = [
   {
     label: 'Dashboard',
     icon: LayoutDashboard,
-    link: '/dashboard', // <--- 2. Ubah ini menjadi /dashboard
+    link: '/dashboard',
+    roles: ['admin'],
   },
   {
     label: galleries.indexTitle,
     icon: Images,
     link:`/${galleryUrl}`,
+    roles: ['admin'],
   },
   {
     label: residents.indexTitle,
     icon: UserRoundPen,
     link: `/${residentUrl}`,
+    roles: ['admin'],
   },
   
   // <--- 3. TAMBAHKAN MENU VALIDASI PENGHUNI DI SINI --->
@@ -49,17 +53,20 @@ const menuItems: Array<{
     label: 'Kelola Pendaftaran',
     icon: UserCheck,
     link: '/validasi',
+    roles: ['admin'],
   },
 
   {
     label: payments.indexTitle,
     icon: WalletMinimal,
     link: `/${paymentUrl}`,
+    roles: ['admin', 'bendahara'],
   },
   {
     label: 'Laporan',
     icon: FileText,
     link: `/${reportUrl}`,
+    roles: ['admin', 'bendahara'],
   },
 ];
 

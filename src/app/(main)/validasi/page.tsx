@@ -28,6 +28,8 @@ interface Pendaftaran {
   program_studi: string;
   jenis_kelamin: string;
   no_hp: string;
+  tanggal_lahir?: string;
+  umur?: number;
   email: string;
   alamat_asal: string;
   nama_wali?: string;
@@ -168,7 +170,9 @@ export default function ValidasiTable() {
           <p><strong>Program Studi:</strong> ${item.program_studi || '-'}</p>
           <p><strong>Jenis Kelamin:</strong> ${item.jenis_kelamin || '-'}</p>
           <p><strong>No HP:</strong> ${item.no_hp || '-'}</p>
-          <p><strong>Email:</strong> ${item.email || '-'}</p>
+           <p><strong>Tanggal Lahir:</strong> ${item.tanggal_lahir || '-'}</p>
+           <p><strong>Umur:</strong> ${item.umur ?? '-'}</p>
+           <p><strong>Email:</strong> ${item.email || '-'}</p>
           <p><strong>Alamat Asal:</strong> ${item.alamat_asal || '-'}</p>
           <hr style="margin: 8px 0; border: 1px solid #eee;" />
           <p><strong>Nama Wali:</strong> ${item.nama_wali || '-'}</p>

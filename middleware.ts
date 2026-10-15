@@ -8,14 +8,15 @@ export function middleware(request: NextRequest) {
   const token = request.cookies.get('TOKEN_AUTH')?.value;
   const role = request.cookies.get('USER_ROLE')?.value?.toLowerCase();
 
-  // Variabel untuk mengecek apakah user sudah memiliki sesi valid sebagai admin
-  const isLoggedInAsAdmin = token && role === 'admin';
+  const isAdmin = role === 'admin';
+  const isBendahara = role === 'bendahara';
+  const canAccessAdmin = Boolean(token && (isAdmin || isBendahara));
+  const bendaharaAllowed = path.startsWith('/payments') || path.startsWith('/reports');
 
   // 1. Jika mengakses path '/' atau '/login'
   if (path === '/' || path.startsWith('/login')) {
-    if (isLoggedInAsAdmin) {
-      // Jika sudah login, langsung "terbangkan" ke dashboard!
-      return NextResponse.redirect(new URL('/dashboard', request.url));
+    if (canAccessAdmin) {
+      return NextResponse.redirect(new URL(isBendahara ? '/payments' : '/dashboard', request.url));
     }
     
     // Jika belum login dan mencoba mengakses '/', arahkan ke '/login'
@@ -27,12 +28,12 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // 2. Proteksi khusus folder dashboard
-  if (path.startsWith('/dashboard')) {
-    if (!isLoggedInAsAdmin) {
-      // Jika belum login (atau token kadaluarsa), lempar kembali ke halaman login
-      return NextResponse.redirect(new URL('/login', request.url));
-    }
+  if (!canAccessAdmin) {
+    return NextResponse.redirect(new URL('/login', request.url));
+  }
+
+  if (isBendahara && !bendaharaAllowed) {
+    return NextResponse.redirect(new URL('/payments', request.url));
   }
 
   // Biarkan file statis/gambar Next.js lewat

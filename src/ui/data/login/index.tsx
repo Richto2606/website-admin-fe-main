@@ -75,6 +75,9 @@ export function LoginForm() {
         if (userRole === 'Admin' || userRole === 'admin') {
           router.replace('/dashboard');
           router.refresh();
+        } else if (userRole === 'Bendahara' || userRole === 'bendahara') {
+          router.replace('/payments');
+          router.refresh();
         } else {
           window.location.href = `https://website-public-main.vercel.app/?token=${token}`;
         }
